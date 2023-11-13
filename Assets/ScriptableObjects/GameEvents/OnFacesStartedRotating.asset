@@ -9,8 +9,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c16e3368ccabfcc46a79f0c687048c81, type: 3}
-  m_Name: Level Manager
+  m_Script: {fileID: 11500000, guid: afcd92a3d7da0ff419919b3468b0267a, type: 3}
+  m_Name: OnFacesStartedRotating
   m_EditorClassIdentifier: 
-  m_levelSize: 1
-  m_position: 5

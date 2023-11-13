@@ -146,10 +146,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb82f4b8a8a8e564a8a5b778999bf94a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_onFaceMovementEnded: {fileID: 11400000, guid: 2cb3254fc115e7642a051f1338a688f3,
+    type: 2}
   m_onDragEnded: {fileID: 11400000, guid: 966cd6bc92e247c4084466e28235257f, type: 2}
   m_renderer: {fileID: 1288303878294481013}
-  moving: 0
-  movingBack: 0
-  targetLocation: {x: 0, y: 0, z: 0}
-  facePosition: 2
-  nextPosition: 0
+  m_cube: {fileID: 0}
+  m_targetLocation: {x: 0, y: 0, z: 0}
+  m_facePosition: 0
+  m_nextPosition: 0

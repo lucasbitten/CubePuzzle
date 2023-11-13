@@ -21,9 +21,9 @@ public class LevelManager : ScriptableObject
     {
         m_mainCube = cube;
 
-        for (int i = 0; i < m_mainCube.faces.Count; i++)
+        for (int i = 0; i < m_mainCube.Faces.Count; i++)
         {
-            m_faces.Add(m_mainCube.faces[i].gameObject);
+            m_faces.Add(m_mainCube.Faces[i].gameObject);
             m_forceFieldFaces.Add(m_forceField.faces[i]);
         }
 

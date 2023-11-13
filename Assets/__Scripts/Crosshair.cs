@@ -9,6 +9,9 @@ public class Crosshair : MonoBehaviour
     [SerializeField] private Canvas m_myCanvas;
 
     [SerializeField] Image m_centerImage;
+    [SerializeField] Sprite m_dragEnabledSprite;
+    [SerializeField] Sprite m_dragDisabledSprite;
+
 
     [SerializeField] Image m_rightInnerImage;
     [SerializeField] Image m_rightOutImage;
@@ -50,7 +53,7 @@ public class Crosshair : MonoBehaviour
     }
 
 
-    public void ShowDragCrosshair(PlayerCubeRotation.DragDirection rotationDirection, float steps)
+    public void ShowDragCrosshair(PlayerCubeRotation.DragDirection rotationDirection, int steps)
     {
 
         ResetColors();
@@ -58,7 +61,7 @@ public class Crosshair : MonoBehaviour
         switch (rotationDirection)
         {
             case PlayerCubeRotation.DragDirection.Up:
-                if(steps >= 1 && steps < 2)
+                if(steps == 1)
                 {
                     m_upInnerImage.color = Color.red;
                 }
@@ -70,7 +73,7 @@ public class Crosshair : MonoBehaviour
 
                 break;
             case PlayerCubeRotation.DragDirection.Down:
-                if (steps >= 1 && steps < 2)
+                if (steps == 1)
                 {
                     m_downInnerImage.color = Color.red;
                 }
@@ -82,7 +85,7 @@ public class Crosshair : MonoBehaviour
 
                 break;
             case PlayerCubeRotation.DragDirection.Right:
-                if (steps >= 1 && steps < 2)
+                if (steps == 1)
                 {
                     m_rightInnerImage.color = Color.red;
                 }
@@ -94,7 +97,7 @@ public class Crosshair : MonoBehaviour
 
                 break;
             case PlayerCubeRotation.DragDirection.Left:
-                if (steps >= 1 && steps < 2)
+                if (steps == 1)
                 {
                     m_leftInnerImage.color = Color.red;
                 }
@@ -104,6 +107,18 @@ public class Crosshair : MonoBehaviour
                     m_leftOutImage.color = Color.red;
                 }
                 break;
+        }
+    }
+
+    public void UpdateIsDragEnableCrosshair(bool enabled)
+    {
+        if (enabled)
+        {
+            m_centerImage.sprite = m_dragEnabledSprite;
+        }
+        else
+        {
+            m_centerImage.sprite = m_dragDisabledSprite;
         }
     }
 }

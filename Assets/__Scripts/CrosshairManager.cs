@@ -1,13 +1,16 @@
 using System;
+using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
+using static CubeMovementController;
 
 [CreateAssetMenu(menuName = "Managers/Crosshair Maanager")]
 public class CrosshairManager : ScriptableObject
 {
+    [SerializeField] CubeManager m_cubeManager;
+    [SerializeField] float m_mouseDragStep = 5f;
 
     Crosshair m_crosshair;
-    [SerializeField] float m_mouseDragStep = 5f;
 
 
     public void SetCrosshair(Crosshair crosshair)
@@ -23,9 +26,86 @@ public class CrosshairManager : ScriptableObject
         }
     }
 
-    public void SetRotation(PlayerCubeRotation.DragDirection rotationDirection, float dragDistance)
+    public void SetRotation(PlayerCubeRotation.DragDirection rotationDirection, float dragDistance, MoveableFace selectedFace)
     {
-        var steps = Mathf.Abs(dragDistance / m_mouseDragStep);
+        //todo: calcular qual direçao é em relaçao a face selecionada
+        int steps = Mathf.RoundToInt(Mathf.Abs(dragDistance / m_mouseDragStep));
+        if (steps > 2) 
+        { 
+            steps = 2;
+        }
+
+        if(steps == 0)
+        {
+            return;
+        }
+
+        float angle = 90 * steps;
+        RotationType rotationType = RotationType.Rotate_X;
+        List<MoveableFace> faces = new List<MoveableFace>();
+
+        switch (selectedFace.CurrentFacePosition)
+        {
+            case MoveableFace.FacePosition.Top:
+            case MoveableFace.FacePosition.Bottom:
+                m_crosshair.UpdateIsDragEnableCrosshair(false);
+                return;
+            case MoveableFace.FacePosition.Right:
+            case MoveableFace.FacePosition.Left:
+
+                switch (rotationDirection)
+                {
+                    case PlayerCubeRotation.DragDirection.Up:
+                        rotationType = RotationType.Rotate_Y;
+                        angle = -angle;
+                        break;
+                    case PlayerCubeRotation.DragDirection.Down:
+                        rotationType = RotationType.Rotate_Y;
+                        break;
+                    case PlayerCubeRotation.DragDirection.Right:
+                        rotationType = RotationType.Rotate_X;
+                        break;
+                    case PlayerCubeRotation.DragDirection.Left:
+                        rotationType = RotationType.Rotate_X;
+                        angle = -angle;
+                        break;
+                    default:
+                        break;
+                }
+
+                break;
+            case MoveableFace.FacePosition.Forward:
+            case MoveableFace.FacePosition.Back:
+                switch (rotationDirection)
+                {
+                    case PlayerCubeRotation.DragDirection.Up:
+                        rotationType = RotationType.Rotate_Z;
+                        angle = -angle;
+                        break;
+                    case PlayerCubeRotation.DragDirection.Down:
+                        rotationType = RotationType.Rotate_Z;
+                        break;
+                    case PlayerCubeRotation.DragDirection.Right:
+                        rotationType = RotationType.Rotate_X;
+                        break;
+                    case PlayerCubeRotation.DragDirection.Left:
+                        rotationType = RotationType.Rotate_X;
+                        angle = -angle;
+                        break;
+                    default:
+                        break;
+                }
+
+                break;
+            default:
+                break;
+        }
+
+
+
+        m_crosshair.UpdateIsDragEnableCrosshair(true);
         m_crosshair.ShowDragCrosshair(rotationDirection, steps);
+        Debug.Log($"Angle: {angle}, RotationType: {rotationType}");
+        m_cubeManager.SetRotationInfo(new RotationInfo(angle, rotationType, faces));
     }
 }

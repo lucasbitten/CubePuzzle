@@ -40,16 +40,20 @@ public class MouseLook : MonoBehaviour
     private void Update()
     {
 
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            Cursor.lockState = CursorLockMode.None;
-        }
-
         if(Input.GetKeyDown(KeyCode.Escape)){
             m_locked = false;
+            Cursor.lockState = CursorLockMode.None;
+            m_dragging = false;
         }
 
-        if(m_locked && !m_dragging)
+        if(Input.GetMouseButtonDown(0))
+        {
+            m_locked = true;
+            Cursor.lockState = CursorLockMode.Locked;
+
+        }
+
+        if (m_locked && !m_dragging)
         {
 
             float mouseX = Input.GetAxis("Mouse X") * m_sensitivity * Time.deltaTime;

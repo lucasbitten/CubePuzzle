@@ -12,4 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a54df99fa2e5db489ffe8dba1e9ada9, type: 3}
   m_Name: Crosshair Manager
   m_EditorClassIdentifier: 
+  m_cubeManager: {fileID: 11400000, guid: 33a1a4b1d156da44ba0d144d3f2ab919, type: 2}
   m_mouseDragStep: 50

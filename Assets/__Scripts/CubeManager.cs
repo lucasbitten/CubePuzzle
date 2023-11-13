@@ -3,12 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static CubeMovementController;
 
 [CreateAssetMenu(menuName = "Managers/Cube Manager")]
 public class CubeManager : ScriptableObject
 {
     [SerializeField] GameEvent_Void m_onRotationEnded;
     [SerializeField] GameEvent_Void m_onRotationStarted;
+    [SerializeField] GameEvent_Void m_onDragEnded;
+    [SerializeField] GameEvent_Int m_onFacesStartedRotating;
+
     [SerializeField] List<MoveableFace> m_faces = new List<MoveableFace>();
     [field: SerializeField] public float DistanceToMove { get; private set; } = 10;
 
@@ -17,6 +21,8 @@ public class CubeManager : ScriptableObject
     GameObject m_facesXRotation = default;
     GameObject m_facesYRotation = default;
     GameObject m_facesZRotation = default;
+
+
 
     public void SetCubeMovementController(CubeMovementController cubeMovementController)
     {
@@ -35,19 +41,47 @@ public class CubeManager : ScriptableObject
         m_faces = faces;
     }
 
-    public void RotateFaces(float angle, RotationType rotationType, List<MoveableFace> facesToMove)
+    public void RotateCube(RotationInfo rotationInfo)
     {
         m_onRotationStarted.Raise();
+        Transform facesRotationParent;
+        List<MoveableFace.FacePosition> facesPositionsToMove;
+        Vector3 axis;
+        SelectFacesToRotate(rotationInfo.RotationType, rotationInfo.FacesToMove, out facesRotationParent, out facesPositionsToMove, out axis);
+
+        m_onFacesStartedRotating.Raise(facesPositionsToMove.Count);
+
+        foreach (MoveableFace face in m_faces)
+        {
+            if (facesPositionsToMove.Contains(face.CurrentFacePosition))
+            {
+                face.transform.SetParent(facesRotationParent);
+
+                int steps = Mathf.RoundToInt(Mathf.Abs(rotationInfo.Angle / 90f));
+                if(steps > 2)
+                {
+                    steps = 2;
+                }
+
+                face.SetNextPosition(rotationInfo.RotationType, steps);
+                face.StartMovingFaces(facesRotationParent, axis + m_cubeMovementController.transform.rotation.eulerAngles, DistanceToMove, rotationInfo.Angle);
+                rotationInfo.FacesToMove.Add(face);
+            }
+        }
+    }
+
+    private void SelectFacesToRotate(RotationType rotationType, List<MoveableFace> facesToMove, out Transform facesRotationParent, out List<MoveableFace.FacePosition> positionsToMove, out Vector3 axis)
+    {
         facesToMove.Clear();
 
-        Transform facesRotationParent = null;
-        List<MoveableFace.FacePosition> positionsToMove = System.Enum.GetValues(typeof(MoveableFace.FacePosition)).Cast<MoveableFace.FacePosition>().ToList();
-        Vector3 axis = Vector3.zero;
+        facesRotationParent = null;
+        positionsToMove = System.Enum.GetValues(typeof(MoveableFace.FacePosition)).Cast<MoveableFace.FacePosition>().ToList();
+        axis = Vector3.zero;
         switch (rotationType)
         {
             case RotationType.Rotate_X:
                 facesRotationParent = m_facesXRotation.transform;
-                positionsToMove.Remove(MoveableFace.FacePosition.Up);
+                positionsToMove.Remove(MoveableFace.FacePosition.Top);
                 positionsToMove.Remove(MoveableFace.FacePosition.Bottom);
                 axis = Vector3.up;
                 break;
@@ -64,19 +98,14 @@ public class CubeManager : ScriptableObject
                 axis = Vector3.right;
                 break;
         }
-
-
-        for (int i = 0; i < m_faces.Count; i++)
-        {
-            if (positionsToMove.Contains(m_faces[i].m_facePosition))
-            {
-                m_faces[i].transform.SetParent(facesRotationParent);
-                m_faces[i].SetNextPosition(rotationType);
-                m_faces[i].StartMovingFaces(facesRotationParent, axis + m_cubeMovementController.transform.rotation.eulerAngles, DistanceToMove, angle);
-                facesToMove.Add(m_faces[i]);
-            }
-        }
     }
 
+    public void SetRotationInfo(RotationInfo rotationInfo)
+    {
+        if(m_cubeMovementController != null)
+        {
+            m_cubeMovementController.SetRotationInfo(rotationInfo);
+        }
+    }
 
 }

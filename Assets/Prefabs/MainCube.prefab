@@ -4124,21 +4124,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_levelManager: {fileID: 11400000, guid: 0d32e69095a1ab94e9594df00fe6b10a, type: 2}
   m_cubeManager: {fileID: 11400000, guid: 33a1a4b1d156da44ba0d144d3f2ab919, type: 2}
-  faces:
+  m_facesXRotator: {fileID: 1965480439891062589}
+  m_facesYRotator: {fileID: 4711160390150003572}
+  m_facesZRotator: {fileID: 4366586496702690417}
+  m_onRotationStarted: {fileID: 11400000, guid: b85dc40c0d8684b4ebc6e8d181eba9f5,
+    type: 2}
+  m_onRotationEnded: {fileID: 11400000, guid: 74509c6793650a846b25d3e82c757c5f, type: 2}
+  m_onFacesStartedRotating: {fileID: 11400000, guid: acd121c3d8087c744b2dc94b021617c2,
+    type: 2}
+  m_onFaceMovementEnded: {fileID: 11400000, guid: 2cb3254fc115e7642a051f1338a688f3,
+    type: 2}
+  m_onDragEnded: {fileID: 11400000, guid: 966cd6bc92e247c4084466e28235257f, type: 2}
+  <Faces>k__BackingField:
   - {fileID: 1716259002271466334}
   - {fileID: 1965480438786344532}
   - {fileID: 3644793227736161296}
   - {fileID: 2117398735840308670}
   - {fileID: 3424181801042828441}
   - {fileID: 262658818967841227}
-  m_facesXRotator: {fileID: 1965480439891062589}
-  m_facesYRotator: {fileID: 4711160390150003572}
-  m_facesZRotator: {fileID: 4366586496702690417}
-  m_rotating: 0
-  m_moveableFacesParent: {fileID: 3144800877328843719}
-  m_onRotationEnded: {fileID: 11400000, guid: 74509c6793650a846b25d3e82c757c5f, type: 2}
-  m_onRotationStarted: {fileID: 11400000, guid: b85dc40c0d8684b4ebc6e8d181eba9f5,
-    type: 2}
 --- !u!1 &1965480440276308326
 GameObject:
   m_ObjectHideFlags: 0
@@ -5361,13 +5364,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1288303878294481017, guid: 662fc8f7735d649498904e6d3771d9bf,
         type: 3}
+      propertyPath: m_cube
+      value: 
+      objectReference: {fileID: 1965480440223654734}
+    - target: {fileID: 1288303878294481017, guid: 662fc8f7735d649498904e6d3771d9bf,
+        type: 3}
       propertyPath: m_facePosition
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1288303878294481017, guid: 662fc8f7735d649498904e6d3771d9bf,
+        type: 3}
+      propertyPath: <CurrentFacePosition>k__BackingField
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1288303878294481019, guid: 662fc8f7735d649498904e6d3771d9bf,
         type: 3}
       propertyPath: m_Name
-      value: Face1
+      value: BottomFace
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5468,13 +5481,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1288303878294481017, guid: 662fc8f7735d649498904e6d3771d9bf,
         type: 3}
+      propertyPath: m_cube
+      value: 
+      objectReference: {fileID: 1965480440223654734}
+    - target: {fileID: 1288303878294481017, guid: 662fc8f7735d649498904e6d3771d9bf,
+        type: 3}
       propertyPath: m_facePosition
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1288303878294481017, guid: 662fc8f7735d649498904e6d3771d9bf,
+        type: 3}
+      propertyPath: <CurrentFacePosition>k__BackingField
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1288303878294481019, guid: 662fc8f7735d649498904e6d3771d9bf,
         type: 3}
       propertyPath: m_Name
-      value: Face2
+      value: RightFace
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5557,10 +5580,15 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 180
       objectReference: {fileID: 0}
+    - target: {fileID: 1288303878294481017, guid: 662fc8f7735d649498904e6d3771d9bf,
+        type: 3}
+      propertyPath: m_cube
+      value: 
+      objectReference: {fileID: 1965480440223654734}
     - target: {fileID: 1288303878294481019, guid: 662fc8f7735d649498904e6d3771d9bf,
         type: 3}
       propertyPath: m_Name
-      value: Face4
+      value: TopFace
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5645,13 +5673,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1288303878294481017, guid: 662fc8f7735d649498904e6d3771d9bf,
         type: 3}
+      propertyPath: m_cube
+      value: 
+      objectReference: {fileID: 1965480440223654734}
+    - target: {fileID: 1288303878294481017, guid: 662fc8f7735d649498904e6d3771d9bf,
+        type: 3}
       propertyPath: m_facePosition
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1288303878294481017, guid: 662fc8f7735d649498904e6d3771d9bf,
+        type: 3}
+      propertyPath: <CurrentFacePosition>k__BackingField
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 1288303878294481019, guid: 662fc8f7735d649498904e6d3771d9bf,
         type: 3}
       propertyPath: m_Name
-      value: Face6
+      value: ForwardFace
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5736,13 +5774,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1288303878294481017, guid: 662fc8f7735d649498904e6d3771d9bf,
         type: 3}
+      propertyPath: m_cube
+      value: 
+      objectReference: {fileID: 1965480440223654734}
+    - target: {fileID: 1288303878294481017, guid: 662fc8f7735d649498904e6d3771d9bf,
+        type: 3}
       propertyPath: m_facePosition
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1288303878294481017, guid: 662fc8f7735d649498904e6d3771d9bf,
+        type: 3}
+      propertyPath: <CurrentFacePosition>k__BackingField
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1288303878294481019, guid: 662fc8f7735d649498904e6d3771d9bf,
         type: 3}
       propertyPath: m_Name
-      value: Face3
+      value: LeftFace
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5831,13 +5879,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1288303878294481017, guid: 662fc8f7735d649498904e6d3771d9bf,
         type: 3}
+      propertyPath: m_cube
+      value: 
+      objectReference: {fileID: 1965480440223654734}
+    - target: {fileID: 1288303878294481017, guid: 662fc8f7735d649498904e6d3771d9bf,
+        type: 3}
       propertyPath: m_facePosition
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1288303878294481017, guid: 662fc8f7735d649498904e6d3771d9bf,
+        type: 3}
+      propertyPath: <CurrentFacePosition>k__BackingField
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1288303878294481019, guid: 662fc8f7735d649498904e6d3771d9bf,
         type: 3}
       propertyPath: m_Name
-      value: Face5
+      value: BackFace
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
