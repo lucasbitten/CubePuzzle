@@ -18,51 +18,46 @@ public class CubeMovementController : MonoBehaviour
 
 
     public List<MoveableFace> faces = new List<MoveableFace>();
-    float position;
-    [SerializeField]
-    GameObject facesXRotation = default;
-    [SerializeField]
-    GameObject facesYRotation = default;
-    [SerializeField]
-    GameObject facesZRotation = default;
+    [SerializeField] GameObject m_facesXRotator = default;
+    [SerializeField] GameObject m_facesYRotator = default;
+    [SerializeField] GameObject m_facesZRotator = default;
 
+    List<MoveableFace> m_facesToMove = new List<MoveableFace>();
 
-    List<MoveableFace> facesToMove = new List<MoveableFace>();
+    public bool m_rotating;
 
-    public bool rotating;
+    Item[] m_items;
 
-    Item[] items;
+    public Transform m_moveableFacesParent;
 
-    public Transform moveableFacesParent;
-
-    [SerializeField] GameEvent_Void OnRotationEnded;
-    [SerializeField] GameEvent_Void OnRotationStarted;
+    [SerializeField] GameEvent_Void m_onRotationEnded;
+    [SerializeField] GameEvent_Void m_onRotationStarted;
 
     void Awake()
     {
-        items = FindObjectsOfType<Item>();
-        OnRotationEnded.EventListeners += CubeMovement_OnRotationEnded;
-        OnRotationStarted.EventListeners += CubeMovement_OnRotationStarted;
+        m_items = FindObjectsOfType<Item>();
+        m_onRotationEnded.EventListeners += OnRotationEnded;
+        m_onRotationStarted.EventListeners += OnRotationStarted;
         m_levelManager.SetMainCube(this);
 
         m_cubeManager.SetCubeMovementController(this);
         m_cubeManager.SetFaces(faces);
-        m_cubeManager.SetRotators(facesXRotation, facesYRotation, facesZRotation);
+        m_cubeManager.SetRotators(m_facesXRotator, m_facesYRotator, m_facesZRotator);
 
     }
-    private void CubeMovement_OnRotationStarted(Void args)
+    private void OnRotationStarted(Void args)
     {
-        rotating = true;
+        m_rotating = true;
         Debug.Log("Rotation starting");
     }
-    private void CubeMovement_OnRotationEnded(Void args)
+    private void OnRotationEnded(Void args)
     {
-        rotating = false;
+        m_rotating = false;
         Debug.Log("Rotation ending");
     }
-    public void Invoke_CubeMovement_OnRotationEnded()
+    public void InvokeOnRotationEnded()
     {
-        OnRotationEnded.Raise();
+        m_onRotationEnded.Raise();
     }
     void Update()
     {
@@ -71,78 +66,23 @@ public class CubeMovementController : MonoBehaviour
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
 
-        if (Input.GetKeyDown(KeyCode.X) && !rotating && !HasItemFalling())
+        if (Input.GetKeyDown(KeyCode.X) && !m_rotating /*&& !HasItemFalling()*/)
         {
-            m_cubeManager.RotateFaces(90, RotationType.Rotate_X, facesToMove);
+            m_cubeManager.RotateFaces(90, RotationType.Rotate_X, m_facesToMove);
         }
-        if (Input.GetKeyDown(KeyCode.Y) && !rotating && !HasItemFalling())
+        if (Input.GetKeyDown(KeyCode.Y) && !m_rotating /*&& !HasItemFalling()*/)
         {
-            m_cubeManager.RotateFaces(90, RotationType.Rotate_Y, facesToMove);
+            m_cubeManager.RotateFaces(90, RotationType.Rotate_Y, m_facesToMove);
         }
-        if (Input.GetKeyDown(KeyCode.Z) && !rotating && !HasItemFalling())
+        if (Input.GetKeyDown(KeyCode.Z) && !m_rotating /*&& !HasItemFalling()*/)
         {
-            m_cubeManager.RotateFaces(90, RotationType.Rotate_Z, facesToMove);
+            m_cubeManager.RotateFaces(90, RotationType.Rotate_Z, m_facesToMove);
         }
-
-
-        //if (Input.GetKeyDown(KeyCode.O) && !rotating && !HasItemFalling())
-        //{
-        //    RotateFullCube(90, Vector3.up);
-        //}
-        //if (Input.GetKeyDown(KeyCode.P) && !rotating && !HasItemFalling())
-        //{
-        //    RotateFullCube(-90, Vector3.up);
-        //}
-        //if (Input.GetKeyDown(KeyCode.K) && !rotating && !HasItemFalling())
-        //{
-        //    RotateFullCube(90, Vector3.right);
-        //}
-        //if (Input.GetKeyDown(KeyCode.L) && !rotating && !HasItemFalling())
-        //{
-        //    RotateFullCube(-90, Vector3.right);
-        //}
-        //if (Input.GetKeyDown(KeyCode.N) && !rotating && !HasItemFalling())
-        //{
-        //    RotateFullCube(90, Vector3.forward);
-        //}
-        //if (Input.GetKeyDown(KeyCode.M) && !rotating && !HasItemFalling())
-        //{
-        //    RotateFullCube(-90, Vector3.forward);
-        //}
     }
-
-    //void RotateFullCube(float angle, Vector3 axis)
-    //{
-    //    OnRotationStarted.Raise();
-    //    StartCoroutine(RotateFullCube(axis, angle, Mathf.Abs(angle / 90)));
-    //}
-
-    //public IEnumerator RotateFullCube(Vector3 axis, float angle, float duration)
-    //{
-    //    Quaternion from = moveableFacesParent.rotation;
-    //    Quaternion to = moveableFacesParent.rotation;
-    //    to *= Quaternion.Euler(axis * angle);
-
-    //    float elapsed = 0.0f;
-    //    while (elapsed < duration)
-    //    {
-    //        moveableFacesParent.rotation = Quaternion.Slerp(from, to, elapsed / duration);
-    //        elapsed += Time.deltaTime;
-    //        yield return null;
-    //    }
-    //    moveableFacesParent.rotation = to;
-    //    rotating = false;
-
-    //    foreach (var face in faces)
-    //    {
-    //        face.SetDirection();
-    //    }
-    //    OnRotationEnded.Raise();
-    //}
 
     public IEnumerator RotateEachFace(Transform rotateAxis, Vector3 axis, float angle, float duration)
     {
-        yield return new WaitWhile (() => CheckIfIsMoving());
+        //yield return new WaitWhile (() => CheckIfIsMoving());
 
         Quaternion from = rotateAxis.rotation;
         Quaternion to = rotateAxis.rotation;
@@ -157,28 +97,24 @@ public class CubeMovementController : MonoBehaviour
         }
         rotateAxis.rotation = to;
 
-        for (int i = 0; i < facesToMove.Count; i++)
+        for (int i = 0; i < m_facesToMove.Count; i++)
         {
-            int xPos = Mathf.RoundToInt(facesToMove[i].transform.position.x);
-            int yPos = Mathf.RoundToInt(facesToMove[i].transform.position.y);
-            int zPos = Mathf.RoundToInt(facesToMove[i].transform.position.z);
+            int xPos = Mathf.RoundToInt(m_facesToMove[i].transform.position.x);
+            int yPos = Mathf.RoundToInt(m_facesToMove[i].transform.position.y);
+            int zPos = Mathf.RoundToInt(m_facesToMove[i].transform.position.z);
 
-            facesToMove[i].transform.position = new Vector3Int(xPos, yPos, zPos);
-            facesToMove[i].transform.localScale = new Vector3(m_levelManager.m_levelSize, m_levelManager.m_levelSize, m_levelManager.m_levelSize);
+            m_facesToMove[i].transform.position = new Vector3Int(xPos, yPos, zPos);
+            m_facesToMove[i].transform.localScale = new Vector3(m_levelManager.m_levelSize, m_levelManager.m_levelSize, m_levelManager.m_levelSize);
             // facesToMove[i].transform.parent = transform;
         }
 
-        for (int i = 0; i < facesToMove.Count; i++)
-        {
-            facesToMove[i].CalculateMovement(-m_cubeManager.DistanceToMove, true);
-        }
     }
 
     bool CheckIfIsMoving()
     {
-        for (int i = 0; i < facesToMove.Count; i++)
+        foreach (MoveableFace face in m_facesToMove)
         {
-            if (!facesToMove[i].movingBack && !facesToMove[i].moving)
+            if (!face.m_movingBack && !face.m_moving)
             {
                 return false;
             }
@@ -187,9 +123,9 @@ public class CubeMovementController : MonoBehaviour
     }
     private bool HasItemFalling() {
 
-        for ( int i = 0; i < items.Length; ++i ) 
+        for ( int i = 0; i < m_items.Length; ++i ) 
         {
-            if (items[i].falling) 
+            if (m_items[i].falling) 
             {
                 return true;
             }

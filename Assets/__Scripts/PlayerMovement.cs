@@ -5,16 +5,8 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
 
-    Rigidbody myRigidBody;
+    [SerializeField] float m_moveSpeed = 5;
 
-    [SerializeField]
-    float moveSpeed = 5;
-
-    void Start()
-    {
-        myRigidBody = GetComponent<Rigidbody>();
-        
-    }
 
     void Update()
     {
@@ -23,8 +15,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void ControlMovement()
     {
-        float translation = Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime;
-        float straffe = Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime;
+        float translation = Input.GetAxis("Vertical") * m_moveSpeed * Time.deltaTime;
+        float straffe = Input.GetAxis("Horizontal") * m_moveSpeed * Time.deltaTime;
 
         transform.Translate(straffe, 0, translation);
     }

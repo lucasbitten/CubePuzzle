@@ -10,7 +10,6 @@ public class LevelManager : ScriptableObject
 
     Switches[] m_levelSwitches;
     CubeMovementController m_mainCube;
-
     ForceFieldCube m_forceField;
 
     List<GameObject> m_faces = new List<GameObject>();
@@ -33,6 +32,12 @@ public class LevelManager : ScriptableObject
         m_levelSwitches = FindObjectsOfType<Switches>();
 
     }
+    public void SetForceFieldCube(ForceFieldCube forceFieldCube)
+    {
+        m_forceField = forceFieldCube;
+    }
+
+
 
 
     public void CheckSwitches(){
@@ -107,8 +112,7 @@ public class LevelManager : ScriptableObject
         Debug.Log("Ajustou o level");
     }
 
-    public void SetForceFieldCube(ForceFieldCube forceFieldCube)
-    {
-        m_forceField = forceFieldCube;
-    }
+
+
+
 }

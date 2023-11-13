@@ -41,26 +41,26 @@ public class CubeManager : ScriptableObject
         facesToMove.Clear();
 
         Transform facesRotationParent = null;
-        List<FacePosition> positionsToMove = System.Enum.GetValues(typeof(FacePosition)).Cast<FacePosition>().ToList();
+        List<MoveableFace.FacePosition> positionsToMove = System.Enum.GetValues(typeof(MoveableFace.FacePosition)).Cast<MoveableFace.FacePosition>().ToList();
         Vector3 axis = Vector3.zero;
         switch (rotationType)
         {
             case RotationType.Rotate_X:
                 facesRotationParent = m_facesXRotation.transform;
-                positionsToMove.Remove(FacePosition.Up);
-                positionsToMove.Remove(FacePosition.Bottom);
+                positionsToMove.Remove(MoveableFace.FacePosition.Up);
+                positionsToMove.Remove(MoveableFace.FacePosition.Bottom);
                 axis = Vector3.up;
                 break;
             case RotationType.Rotate_Y:
                 facesRotationParent = m_facesYRotation.transform;
-                positionsToMove.Remove(FacePosition.Forward);
-                positionsToMove.Remove(FacePosition.Back);
+                positionsToMove.Remove(MoveableFace.FacePosition.Forward);
+                positionsToMove.Remove(MoveableFace.FacePosition.Back);
                 axis = Vector3.forward;
                 break;
             case RotationType.Rotate_Z:
                 facesRotationParent = m_facesZRotation.transform;
-                positionsToMove.Remove(FacePosition.Right);
-                positionsToMove.Remove(FacePosition.Left);
+                positionsToMove.Remove(MoveableFace.FacePosition.Right);
+                positionsToMove.Remove(MoveableFace.FacePosition.Left);
                 axis = Vector3.right;
                 break;
         }
@@ -68,12 +68,12 @@ public class CubeManager : ScriptableObject
 
         for (int i = 0; i < m_faces.Count; i++)
         {
-            if (positionsToMove.Contains(m_faces[i].facePosition))
+            if (positionsToMove.Contains(m_faces[i].m_facePosition))
             {
                 m_faces[i].transform.SetParent(facesRotationParent);
                 m_faces[i].SetNextPosition(rotationType);
-                m_faces[i].GetComponent<MoveableFace>().Move(facesRotationParent, axis + m_cubeMovementController.transform.rotation.eulerAngles, DistanceToMove, angle);
-                facesToMove.Add(m_faces[i].GetComponent<MoveableFace>());
+                m_faces[i].StartMovingFaces(facesRotationParent, axis + m_cubeMovementController.transform.rotation.eulerAngles, DistanceToMove, angle);
+                facesToMove.Add(m_faces[i]);
             }
         }
     }

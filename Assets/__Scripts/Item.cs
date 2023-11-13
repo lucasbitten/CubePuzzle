@@ -141,7 +141,7 @@ public class Item : MonoBehaviour
         {
             var face = other.gameObject.GetComponent<MoveableFace>();
 
-            if ((face && face.facePosition == FacePosition.Bottom) || other.gameObject.CompareTag("Obstacles"))
+            if ((face && face.m_facePosition == MoveableFace.FacePosition.Bottom) || other.gameObject.CompareTag("Obstacles"))
             {
                 transform.SetParent(other.transform);
                 falling = false;

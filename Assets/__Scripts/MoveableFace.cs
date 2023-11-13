@@ -1,44 +1,80 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum FacePosition
-{
-    Up,
-    Bottom,
-    Right,
-    Left,
-    Forward,
-    Back
-}
+
 public class MoveableFace : MonoBehaviour
 {
-    public bool moving;
-    public bool movingBack;
-    CubeMovementController cube;
-    public Vector3 targetLocation;
+    public enum FacePosition
+    {
+        Up,
+        Bottom,
+        Right,
+        Left,
+        Forward,
+        Back
+    }
 
-    public FacePosition facePosition;
-    public FacePosition nextPosition;
-    Transform moveableFacesParent;
+    [SerializeField] GameEvent_Void m_onDragEnded;
+    [SerializeField] Renderer m_renderer;
+
+    public bool m_moving;
+    public bool m_movingBack;
+    CubeMovementController m_cube;
+    public Vector3 m_targetLocation;
+
+    public FacePosition m_facePosition;
+    public FacePosition m_nextPosition;
+    Transform m_moveableFacesParent;
+
+
+    MaterialPropertyBlock m_selectedMaterialPropertyBlock;
+    MaterialPropertyBlock m_unselectedMaterialPropertyBlock;
 
     private void Awake() 
     {
-        cube = FindObjectOfType<CubeMovementController>();
-        moveableFacesParent = transform.parent;
-        name = $"{facePosition} Face";
+        m_onDragEnded.EventListeners += OnDragEnded;
+
+        m_selectedMaterialPropertyBlock = new MaterialPropertyBlock();
+        m_selectedMaterialPropertyBlock.SetColor("_BaseColor", Color.red);
+
+        m_unselectedMaterialPropertyBlock = new MaterialPropertyBlock();
+        m_unselectedMaterialPropertyBlock.SetColor("_BaseColor", Color.blue);
+
+        m_cube = FindObjectOfType<CubeMovementController>();
+        m_moveableFacesParent = transform.parent;
+        name = $"{m_facePosition} Face";
     }
-    public void Move(Transform rotateAxis, Vector3 axis, float distanceToMove, float angle)
+
+    private void OnDragEnded(Void obj)
     {
-        CalculateMovement(distanceToMove, false);
-        StartCoroutine(cube.RotateEachFace(rotateAxis, axis, angle, Mathf.Abs(angle / 90)));
+        Unselected();
     }
-    public void CalculateMovement(float distanceToMove, bool goingBack)
+
+    public void StartMovingFaces(Transform rotateAxis, Vector3 axis, float distanceToMove, float angle)
+    {
+        m_moving = true;
+        StartCoroutine(SeparateFacesCoroutine(rotateAxis, axis, distanceToMove, angle));
+    }
+
+    IEnumerator SeparateFacesCoroutine(Transform rotateAxis, Vector3 axis, float distanceToMove, float angle)
+    {
+        bool goingBack = false;
+        CalculateEndPosition(distanceToMove, goingBack); // Calculate separated position
+        yield return StartCoroutine(MoveFace()); // Separating faces from main cube
+        yield return StartCoroutine(m_cube.RotateEachFace(rotateAxis, axis, angle, Mathf.Abs(angle / 90))); // Moving faces to new cube sides
+        CalculateEndPosition(-distanceToMove, !goingBack); // Calculate end position
+        StartCoroutine(AssembleFaces()); // Moving faces back to main cube
+    }
+
+
+    public void CalculateEndPosition(float distanceToMove, bool goingBack)
     {        
         Vector3 relativeLocation = new Vector3();
 
         //Start to Check in which side the face is
-        switch (goingBack ? nextPosition : facePosition)
+        switch (goingBack ? m_nextPosition : m_facePosition)
         {
             case FacePosition.Up:
                 relativeLocation = new Vector3(0, distanceToMove, 0);
@@ -61,28 +97,55 @@ public class MoveableFace : MonoBehaviour
         }
 
         // Get the position where the face need to go
-        targetLocation = transform.position + relativeLocation;
-
-        StartCoroutine(MoveFace(targetLocation, goingBack));
-
+        m_targetLocation = transform.position + relativeLocation;
     }
-    public IEnumerator MoveFace(Vector3 target, bool goingBack)
+
+    IEnumerator SeparateFaces(Vector3 target)
     {
-
         float elapsedTime = 0;
-
-        if(goingBack)
-        {
-            movingBack = true;
-        } 
-        else
-        {
-            moving = true;
-        }
 
         // Will need to perform some of this process and yield until next frames
         float closeEnough = 0.1f;
         float distance = (transform.position - target).magnitude;
+
+        // GC will trigger unless we define this ahead of time
+        WaitForEndOfFrame wait = new WaitForEndOfFrame();
+
+        // Continue until we're there
+        while (distance >= closeEnough)
+        {
+            elapsedTime += Time.deltaTime;
+
+            transform.position = Vector3.Slerp(transform.position, target, elapsedTime / 2);
+            yield return wait;
+
+            distance = (transform.position - target).magnitude;
+        }
+
+        // Complete the motion to prevent negligible sliding
+        transform.position = target;
+    }
+
+    IEnumerator AssembleFaces()
+    {
+        yield return StartCoroutine(MoveFace());
+
+        transform.position = new Vector3(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y), Mathf.RoundToInt(transform.position.z));
+        m_movingBack = false;
+        //cube.SetBottomFace();
+
+        transform.SetParent(m_moveableFacesParent);
+        SetDirection();
+        m_cube.InvokeOnRotationEnded();
+    }
+    IEnumerator MoveFace()
+    {
+
+        float elapsedTime = 0;
+
+        // Will need to perform some of this process and yield until next frames
+        float closeEnough = 0.1f;
+        float distance = (transform.position - m_targetLocation).magnitude;
 
         // GC will trigger unless we define this ahead of time
         WaitForEndOfFrame wait = new WaitForEndOfFrame();
@@ -91,113 +154,99 @@ public class MoveableFace : MonoBehaviour
         {
             elapsedTime += Time.deltaTime;
 
-            transform.position = Vector3.Slerp(transform.position, target, elapsedTime/2);
+            transform.position = Vector3.Slerp(transform.position, m_targetLocation, elapsedTime/2);
             yield return wait;
 
-            distance = (transform.position - target).magnitude;
+            distance = (transform.position - m_targetLocation).magnitude;
         }
 
         // Complete the motion to prevent negligible sliding
-        transform.position = target;
-
-        if (goingBack)
-        {
-            transform.position = new Vector3 (Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y), Mathf.RoundToInt(transform.position.z) );
-            movingBack = false;
-            //cube.SetBottomFace();
-
-            transform.SetParent(moveableFacesParent);
-            SetDirection();
-            cube.Invoke_CubeMovement_OnRotationEnded();
-        }
-        else
-        {
-            moving = false;
-        }    
+        transform.position = m_targetLocation;
     }
+
     public void SetDirection()
     {
         Vector3Int upDirection = new Vector3Int(Mathf.RoundToInt(transform.up.x), Mathf.RoundToInt(transform.up.y), Mathf.RoundToInt(transform.up.z));
 
         if (V3Equal(upDirection, Vector3.up))
         {
-            facePosition = FacePosition.Bottom;
+            m_facePosition = FacePosition.Bottom;
         }
         else if (V3Equal(upDirection, Vector3.down))
         {
-            facePosition = FacePosition.Up;
+            m_facePosition = FacePosition.Up;
         }
         else if (V3Equal(upDirection, Vector3.right))
         {
-            facePosition = FacePosition.Left;
+            m_facePosition = FacePosition.Left;
         }
         else if (V3Equal(upDirection, Vector3.left))
         {
-            facePosition = FacePosition.Right;
+            m_facePosition = FacePosition.Right;
         }
         else if (V3Equal(upDirection, Vector3.forward))
         {
-            facePosition = FacePosition.Back;
+            m_facePosition = FacePosition.Back;
         }
         else if (V3Equal(upDirection, Vector3.back))
         {
-            facePosition = FacePosition.Forward;
+            m_facePosition = FacePosition.Forward;
         }
 
-        name = $"{facePosition} Face";
+        name = $"{m_facePosition} Face";
     }
     public void SetNextPosition(RotationType rotationType)
     {
         switch (rotationType)
         {
             case RotationType.Rotate_X:
-                switch (facePosition)
+                switch (m_facePosition)
                 {
                     case FacePosition.Right:
-                        nextPosition = FacePosition.Back;
+                        m_nextPosition = FacePosition.Back;
                         break;
                     case FacePosition.Left:
-                        nextPosition = FacePosition.Forward;
+                        m_nextPosition = FacePosition.Forward;
                         break;
                     case FacePosition.Forward:
-                        nextPosition = FacePosition.Right;
+                        m_nextPosition = FacePosition.Right;
                         break;
                     case FacePosition.Back:
-                        nextPosition = FacePosition.Left;
+                        m_nextPosition = FacePosition.Left;
                         break;
                 }
                 break;
             case RotationType.Rotate_Y:
-                switch (facePosition)
+                switch (m_facePosition)
                 {
                     case FacePosition.Right:
-                        nextPosition = FacePosition.Up;
+                        m_nextPosition = FacePosition.Up;
                         break;
                     case FacePosition.Left:
-                        nextPosition = FacePosition.Bottom;
+                        m_nextPosition = FacePosition.Bottom;
                         break;
                     case FacePosition.Up:
-                        nextPosition = FacePosition.Left;
+                        m_nextPosition = FacePosition.Left;
                         break;
                     case FacePosition.Bottom:
-                        nextPosition = FacePosition.Right;
+                        m_nextPosition = FacePosition.Right;
                         break;
                 }
                 break;
             case RotationType.Rotate_Z:
-                switch (facePosition)
+                switch (m_facePosition)
                 {
                     case FacePosition.Up:
-                        nextPosition = FacePosition.Forward;
+                        m_nextPosition = FacePosition.Forward;
                         break;
                     case FacePosition.Bottom:
-                        nextPosition = FacePosition.Back;
+                        m_nextPosition = FacePosition.Back;
                         break;
                     case FacePosition.Forward:
-                        nextPosition = FacePosition.Bottom;
+                        m_nextPosition = FacePosition.Bottom;
                         break;
                     case FacePosition.Back:
-                        nextPosition = FacePosition.Up;
+                        m_nextPosition = FacePosition.Up;
                         break;
                 }
                 break;
@@ -207,5 +256,17 @@ public class MoveableFace : MonoBehaviour
     {
         return Vector3.SqrMagnitude(a - b) < 0.0001;
     }
+
+    public void Selected()
+    {
+        m_renderer.SetPropertyBlock(m_selectedMaterialPropertyBlock);
+    }
+
+    public void Unselected()
+    {
+        m_renderer.SetPropertyBlock(m_unselectedMaterialPropertyBlock);
+
+    }
+
 
 }
