@@ -9,6 +9,7 @@ public class CrosshairManager : ScriptableObject
 {
     [SerializeField] CubeManager m_cubeManager;
     [SerializeField] float m_mouseDragStep = 5f;
+    [field: SerializeField] public float MouseDragThreshold { get; private set; } = 30f;
 
     Crosshair m_crosshair;
 
@@ -26,16 +27,30 @@ public class CrosshairManager : ScriptableObject
         }
     }
 
+    public void ResetColors()
+    {
+        if (m_crosshair != null)
+        {
+            m_crosshair.ResetColors();
+        }
+    }
+
+
+    public void UpdateIsDragEnableCrosshair(bool dragEnabled)
+    {
+        m_crosshair.UpdateIsDragEnableCrosshair(dragEnabled);
+    }
+
     public void SetRotation(PlayerCubeRotation.DragDirection rotationDirection, float dragDistance, MoveableFace selectedFace)
     {
-        //todo: calcular qual direçao é em relaçao a face selecionada
         int steps = Mathf.RoundToInt(Mathf.Abs(dragDistance / m_mouseDragStep));
         if (steps > 2) 
         { 
             steps = 2;
         }
 
-        if(steps == 0)
+
+        if (steps == 0)
         {
             return;
         }
@@ -46,10 +61,6 @@ public class CrosshairManager : ScriptableObject
 
         switch (selectedFace.CurrentFacePosition)
         {
-            case MoveableFace.FacePosition.Top:
-            case MoveableFace.FacePosition.Bottom:
-                m_crosshair.UpdateIsDragEnableCrosshair(false);
-                return;
             case MoveableFace.FacePosition.Right:
             case MoveableFace.FacePosition.Left:
 

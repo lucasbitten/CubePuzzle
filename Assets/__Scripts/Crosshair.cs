@@ -34,9 +34,10 @@ public class Crosshair : MonoBehaviour
     {
         m_myCanvas.enabled = show;
         m_centerImage.color = Color.red;
+        ResetColors();
     }
 
-    void ResetColors()
+    public void ResetColors()
     {
 
         m_rightInnerImage.color = Color.white;
@@ -55,7 +56,7 @@ public class Crosshair : MonoBehaviour
 
     public void ShowDragCrosshair(PlayerCubeRotation.DragDirection rotationDirection, int steps)
     {
-
+        Debug.Log($"Steps {steps}");
         ResetColors();
 
         switch (rotationDirection)

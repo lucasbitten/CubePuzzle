@@ -43,15 +43,19 @@ public class PlayerCubeRotation : MonoBehaviour
                 if(hit.collider.TryGetComponent(out m_selectedFace))
                 {
                     Debug.Log($"Hit Face {hit.collider.name}");
-                    if(m_selectedFace.CurrentFacePosition == MoveableFace.FacePosition.Top ||
-                        m_selectedFace.CurrentFacePosition == MoveableFace.FacePosition.Bottom)
-                    {
-                        m_selectedFace = null;
-                    }
-                    else
+                    var dragEnabled = m_selectedFace.CurrentFacePosition != MoveableFace.FacePosition.Top &&
+                        m_selectedFace.CurrentFacePosition != MoveableFace.FacePosition.Bottom;
+
+                    if (dragEnabled)
                     {
                         m_selectedFace.Selected();
                     }
+                    else
+                    {
+                        m_selectedFace = null;
+                    }
+
+                    m_crosshairManager.UpdateIsDragEnableCrosshair(dragEnabled);
                 }
             }
 
@@ -63,20 +67,18 @@ public class PlayerCubeRotation : MonoBehaviour
 
             m_crosshairManager.ShowCrosshair(false);
             m_onDragEnded.Raise();
-
-            //todo: handle rotation
-
         }
 
         if(Input.GetMouseButton(1))
         {
-            if (m_selectedFace == null)
+            if(m_selectedFace == null)
             {
                 return;
             }
+
             var dragDelta = Input.mousePosition - m_initialDragPosition;
 
-            if(Mathf.Abs(dragDelta.x) > Mathf.Abs(dragDelta.y))
+            if(Mathf.Abs(dragDelta.x) > Mathf.Abs(dragDelta.y) && Mathf.Abs(dragDelta.x) > m_crosshairManager.MouseDragThreshold)
             {
                 //Dragging on X axis
                 if(dragDelta.x >= 0)
@@ -87,12 +89,10 @@ public class PlayerCubeRotation : MonoBehaviour
                 {
                     m_rotationDirection = DragDirection.Left;
                 }
-
-                //todo: calcular qual direçao é em relaçao a face selecionada
                 m_crosshairManager.SetRotation(m_rotationDirection, dragDelta.x, m_selectedFace);
 
             }
-            else
+            else if(Mathf.Abs(dragDelta.y) > m_crosshairManager.MouseDragThreshold)
             {
                 //Dragging on Y axis
                 if (dragDelta.y >= 0)
@@ -104,14 +104,12 @@ public class PlayerCubeRotation : MonoBehaviour
                     m_rotationDirection = DragDirection.Down;
                 }
 
-                //todo: calcular qual direçao é em relaçao a face selecionada
                 m_crosshairManager.SetRotation(m_rotationDirection, dragDelta.y, m_selectedFace);
-
             }
-
-
+            else
+            {
+                m_crosshairManager.ResetColors();
+            }
         }
-
-
     }
 }
