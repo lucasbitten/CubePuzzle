@@ -49,6 +49,7 @@ public class CubeMovementController : MonoBehaviour
     private int m_facesRotating;
     RotationInfo m_currentRotationInfo;
 
+    [SerializeField] float m_levelSize;
 
     void Awake()
     {
@@ -125,6 +126,11 @@ public class CubeMovementController : MonoBehaviour
     }
 
 
+    public void SetLevelSize(float levelSize)
+    {
+        m_levelSize = levelSize;
+    }
+
     public void SetRotationInfo(RotationInfo rotationInfo)
     {
         m_currentRotationInfo = rotationInfo;
@@ -192,7 +198,7 @@ public class CubeMovementController : MonoBehaviour
             int zPos = Mathf.RoundToInt(m_facesToMove[i].transform.position.z);
 
             m_facesToMove[i].transform.position = new Vector3Int(xPos, yPos, zPos);
-            m_facesToMove[i].transform.localScale = new Vector3(m_levelManager.m_levelSize, m_levelManager.m_levelSize, m_levelManager.m_levelSize);
+            m_facesToMove[i].transform.localScale = new Vector3(m_levelSize, m_levelSize, m_levelSize);
             // facesToMove[i].transform.parent = transform;
         }
 
