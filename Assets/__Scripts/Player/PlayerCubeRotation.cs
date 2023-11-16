@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Burst.CompilerServices;
 using UnityEngine;
 
 public class PlayerCubeRotation : MonoBehaviour
@@ -14,7 +15,7 @@ public class PlayerCubeRotation : MonoBehaviour
 
     [SerializeField] LayerMask m_cubeFacesLayer;
 
-
+    [SerializeField] CubeManager m_cubeManager;
     [SerializeField] CrosshairManager m_crosshairManager;
     [SerializeField] GameEvent_Void m_onDragStarted;
     [SerializeField] GameEvent_Void m_onDragEnded;
@@ -26,39 +27,49 @@ public class PlayerCubeRotation : MonoBehaviour
     MoveableFace m_selectedFace;
     void Update()
     {
+        m_selectedFace = null;
 
-        if (Input.GetMouseButtonDown(1))
+        if(!m_cubeManager.CanRotate())
         {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = false;
+            m_crosshairManager.UpdateIsDragEnableCrosshair(false);
+            return;
+        }
 
-            m_crosshairManager.ShowCrosshair(true);
-            m_initialDragPosition = Input.mousePosition;
-            m_onDragStarted.Raise();
 
-            Ray ray = new Ray(m_playerCamera.position, m_playerCamera.forward);
-            RaycastHit hit;
-            if(Physics.Raycast(ray, out hit, 100f, m_cubeFacesLayer.value))
+        Ray ray = new Ray(m_playerCamera.position, m_playerCamera.forward);
+        RaycastHit hit;
+        bool dragEnabled = false;
+        if (Physics.Raycast(ray, out hit, 100f, m_cubeFacesLayer.value))
+        {
+            if (hit.collider.TryGetComponent(out m_selectedFace))
             {
-                if(hit.collider.TryGetComponent(out m_selectedFace))
-                {
-                    Debug.Log($"Hit Face {hit.collider.name}");
-                    var dragEnabled = m_selectedFace.CurrentFacePosition != MoveableFace.FacePosition.Top &&
-                        m_selectedFace.CurrentFacePosition != MoveableFace.FacePosition.Bottom;
+                dragEnabled = m_selectedFace.CurrentFacePosition != MoveableFace.FacePosition.Top &&
+                    m_selectedFace.CurrentFacePosition != MoveableFace.FacePosition.Bottom;
 
-                    if (dragEnabled)
-                    {
-                        m_selectedFace.Selected();
-                    }
-                    else
-                    {
-                        m_selectedFace = null;
-                    }
-
-                    m_crosshairManager.UpdateIsDragEnableCrosshair(dragEnabled);
-                }
+                m_crosshairManager.UpdateIsDragEnableCrosshair(dragEnabled);
             }
+        }
 
+
+        if (Input.GetMouseButtonDown(1) && dragEnabled)
+        {
+            if(!m_cubeManager.IsRotating() && !m_cubeManager.HasItemFalling()) 
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = false;
+
+                m_crosshairManager.ShowCrosshair(true);
+                m_initialDragPosition = Input.mousePosition;
+                m_onDragStarted.Raise();
+
+                Debug.Log($"Hit Face {hit.collider.name}");
+                if (dragEnabled)
+                {
+                    m_selectedFace.Selected();
+                }
+
+                m_crosshairManager.UpdateIsDragEnableCrosshair(dragEnabled);
+            }
         }
 
         if(Input.GetMouseButtonUp(1))
@@ -71,7 +82,7 @@ public class PlayerCubeRotation : MonoBehaviour
 
         if(Input.GetMouseButton(1))
         {
-            if(m_selectedFace == null)
+            if(!dragEnabled)
             {
                 return;
             }

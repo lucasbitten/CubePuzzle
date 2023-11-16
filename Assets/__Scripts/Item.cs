@@ -6,42 +6,46 @@ using UnityEngine;
 public class Item : MonoBehaviour
 {
 
-    Rigidbody myRigidbody;
-    public bool falling;
-    public bool beingCarried;
+    [SerializeField] Rigidbody m_myRigidbody;
 
-    public bool rotating;
+    public bool m_falling;
+    public bool m_locked;
+    public bool m_beingCarried;
 
-    [SerializeField] GameEvent_Void OnRotationEnded;
-    [SerializeField] GameEvent_Void OnRotationStarted;
+    [SerializeField] GameEvent_Void m_onRotationEnded;
+    [SerializeField] GameEvent_Void m_onRotationStarted;
 
-    public LayerMask raycastLayer;
+    public LayerMask m_raycastLayer;
     
     private void Start()
     {
-        myRigidbody = GetComponent<Rigidbody>();
         Physics.IgnoreLayerCollision(9,10);
+    }
 
-        OnRotationStarted.EventListeners += Cube_OnRotationStarted;
-        OnRotationEnded.EventListeners += Cube_OnRotationEnded;
-    }
-    private void OnDestroy()
+    private void OnEnable()
     {
-        OnRotationStarted.EventListeners -= Cube_OnRotationStarted;
-        OnRotationEnded.EventListeners -= Cube_OnRotationEnded;
+        m_onRotationStarted.EventListeners += OnRotationStarted;
+        m_onRotationEnded.EventListeners += OnRotationEnded;
     }
-    private void Cube_OnRotationEnded(Void args)
+
+    private void OnDisable()
+    {
+        m_onRotationStarted.EventListeners -= OnRotationStarted;
+        m_onRotationEnded.EventListeners -= OnRotationEnded;
+    }
+
+    private void OnRotationEnded(Void args)
     {
         UnlockMovement();
     }
-    private void Cube_OnRotationStarted(Void args)
+    private void OnRotationStarted(Void args)
     {
         LockMovement();
     }
 
     public void LockMovement()
     {
-        myRigidbody.constraints = RigidbodyConstraints.FreezeAll;   
+        m_myRigidbody.constraints = RigidbodyConstraints.FreezeAll;   
     }
 
     private void OnDrawGizmos()
@@ -55,28 +59,28 @@ public class Item : MonoBehaviour
     {
         ClearConstraints();
         Ray ray = new Ray(transform.position, Vector3.down);
-        Physics.Raycast(ray, out RaycastHit hit, 0.5f, raycastLayer);
+        Physics.Raycast(ray, out RaycastHit hit, 0.5f, m_raycastLayer);
         
         if(hit.collider)
         {
             if (hit.collider.CompareTag("Obstacles") || hit.collider.CompareTag("Faces"))
             {
-                falling = false;
+                m_falling = false;
                 Debug.LogWarning("Not Falling");
             }
             else if (hit.collider.CompareTag("Items"))
             {
                 //Check if item is above other item
-                Physics.Raycast(hit.collider.transform.position, Vector3.down, out RaycastHit itemHit, 0.5f, raycastLayer);
+                Physics.Raycast(hit.collider.transform.position, Vector3.down, out RaycastHit itemHit, 0.5f, m_raycastLayer);
                 if (itemHit.collider && (itemHit.collider.CompareTag("Obstacles") || itemHit.collider.CompareTag("Faces")))
                 {
-                    falling = false;
+                    m_falling = false;
                     Debug.LogWarning("Not Falling too");
 
                 }
                 else
                 {
-                    falling = true;
+                    m_falling = true;
                     Debug.LogWarning("Faaaalling");
 
                 }
@@ -84,33 +88,33 @@ public class Item : MonoBehaviour
         }
         else
         {
-            falling = true;
+            m_falling = true;
             Debug.LogWarning("Falling");
 
         }
 
-        rotating = false;        
+        m_locked = false;        
     }
 
     private void OnCollisionEnter(Collision other)
     {
-        if(falling)
+        if(m_falling)
         {
             if(other.gameObject.CompareTag("Items"))
             {   
                 if (other.transform.parent)
                 {
-                    transform.parent = other.transform.parent.transform;
+                    AttachToObject(other.transform.parent.transform);
                 } 
                 else
                 {
                     //transform.parent = cube.transform;
                 }
-                rotating = false;
-                falling = false;
+                m_locked = false;
+                m_falling = false;
             } 
 
-            myRigidbody.constraints = RigidbodyConstraints.FreezeRotation;
+            m_myRigidbody.constraints = RigidbodyConstraints.FreezeRotation;
 
             var vec = transform.eulerAngles;
             vec.x = Mathf.Round(vec.x / 90) * 90;
@@ -124,12 +128,12 @@ public class Item : MonoBehaviour
             {
                 if (transform.position.y > other.transform.position.y)
                 {
-                    transform.SetParent(other.transform.parent);
+                    AttachToObject(other.transform.parent);
                 }
             }
         }
 
-        if(beingCarried)
+        if(m_beingCarried)
         {
             if (!other.gameObject.CompareTag("Player"))
             {
@@ -141,19 +145,29 @@ public class Item : MonoBehaviour
         {
             var face = other.gameObject.GetComponent<MoveableFace>();
 
-            if ((face && face.CurrentFacePosition == MoveableFace.FacePosition.Bottom) || other.gameObject.CompareTag("Obstacles"))
+            if (face && face.CurrentFacePosition == MoveableFace.FacePosition.Bottom)
             {
-                transform.SetParent(other.transform);
-                falling = false;
-                rotating = false;
+                AttachToObject(other.transform);
+                m_falling = false;
+                m_locked = false;
             }
         }
     }
 
     public void ClearConstraints()
     {
-        myRigidbody.constraints = RigidbodyConstraints.None;
+        m_myRigidbody.constraints = RigidbodyConstraints.None;
     }
+
+    public void AttachToObject(Transform transform, bool lockConstraints = true)
+    {
+        transform.SetParent(transform);
+        if(lockConstraints )
+        {
+            LockMovement();
+        }
+    }
+
 
     void OnTriggerEnter(Collider other)
     {

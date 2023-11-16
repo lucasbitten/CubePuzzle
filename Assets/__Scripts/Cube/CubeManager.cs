@@ -108,4 +108,19 @@ public class CubeManager : ScriptableObject
         }
     }
 
+    public bool IsRotating()
+    {
+        return m_cubeMovementController.IsRotating;
+    }
+
+    public bool HasItemFalling()
+    {
+        return m_cubeMovementController.HasItemFalling();
+    }
+
+    public bool CanRotate()
+    {
+        return !IsRotating() && !HasItemFalling();
+    }
+
 }

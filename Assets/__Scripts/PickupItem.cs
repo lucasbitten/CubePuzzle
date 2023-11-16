@@ -105,7 +105,7 @@ public class PickupItem : MonoBehaviour
     public void Drop(){
         
         isHolding = false; 
-        item.GetComponent<Item>().falling = true;
+        item.GetComponent<Item>().m_falling = true;
         objectPos = item.transform.position;
         item.GetComponent<Rigidbody>().useGravity = true;
         item.transform.position = objectPos;

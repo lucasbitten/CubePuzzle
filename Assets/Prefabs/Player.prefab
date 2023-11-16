@@ -392,7 +392,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc13c414d5687974a983b35f11127c2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
+  m_moveSpeed: 5
 --- !u!114 &6892381011840479278
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -429,6 +429,7 @@ MonoBehaviour:
   m_cubeFacesLayer:
     serializedVersion: 2
     m_Bits: 8192
+  m_cubeManager: {fileID: 11400000, guid: 33a1a4b1d156da44ba0d144d3f2ab919, type: 2}
   m_crosshairManager: {fileID: 11400000, guid: 2143cab4931b77d4a98251f335e07526, type: 2}
   m_onDragStarted: {fileID: 11400000, guid: 5026910e8b6dcc543a5e4809568f036a, type: 2}
   m_onDragEnded: {fileID: 11400000, guid: 966cd6bc92e247c4084466e28235257f, type: 2}

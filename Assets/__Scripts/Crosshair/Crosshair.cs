@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class Crosshair : MonoBehaviour
 {
     [SerializeField] private CrosshairManager m_crosshairManager;
-    [SerializeField] private Canvas m_myCanvas;
+    [SerializeField] private Canvas m_arrowsCanvas;
 
     [SerializeField] Image m_centerImage;
     [SerializeField] Sprite m_dragEnabledSprite;
@@ -32,7 +32,7 @@ public class Crosshair : MonoBehaviour
 
     public void ShowCrosshair(bool show)
     {
-        m_myCanvas.enabled = show;
+        m_arrowsCanvas.enabled = show;
         m_centerImage.color = Color.red;
         ResetColors();
     }
