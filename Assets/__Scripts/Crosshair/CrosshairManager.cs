@@ -62,6 +62,26 @@ public class CrosshairManager : ScriptableObject
         switch (selectedFace.CurrentFacePosition)
         {
             case MoveableFace.FacePosition.Right:
+                switch (rotationDirection)
+                {
+                    case PlayerCubeRotation.DragDirection.Up:
+                        rotationType = RotationType.Rotate_Y;
+                        break;
+                    case PlayerCubeRotation.DragDirection.Down:
+                        rotationType = RotationType.Rotate_Y;
+                        angle = -angle;
+                        break;
+                    case PlayerCubeRotation.DragDirection.Right:
+                        rotationType = RotationType.Rotate_X;
+                        break;
+                    case PlayerCubeRotation.DragDirection.Left:
+                        rotationType = RotationType.Rotate_X;
+                        angle = -angle;
+                        break;
+                    default:
+                        break;
+                }
+                break;
             case MoveableFace.FacePosition.Left:
 
                 switch (rotationDirection)
@@ -86,7 +106,6 @@ public class CrosshairManager : ScriptableObject
 
                 break;
             case MoveableFace.FacePosition.Forward:
-            case MoveableFace.FacePosition.Back:
                 switch (rotationDirection)
                 {
                     case PlayerCubeRotation.DragDirection.Up:
@@ -94,6 +113,28 @@ public class CrosshairManager : ScriptableObject
                         angle = -angle;
                         break;
                     case PlayerCubeRotation.DragDirection.Down:
+                        rotationType = RotationType.Rotate_Z;
+                        break;
+                    case PlayerCubeRotation.DragDirection.Right:
+                        rotationType = RotationType.Rotate_X;
+                        break;
+                    case PlayerCubeRotation.DragDirection.Left:
+                        rotationType = RotationType.Rotate_X;
+                        angle = -angle;
+                        break;
+                    default:
+                        break;
+                }
+
+                break;
+            case MoveableFace.FacePosition.Back:
+                switch (rotationDirection)
+                {
+                    case PlayerCubeRotation.DragDirection.Up:
+                        rotationType = RotationType.Rotate_Z;
+                        break;
+                    case PlayerCubeRotation.DragDirection.Down:
+                        angle = -angle;
                         rotationType = RotationType.Rotate_Z;
                         break;
                     case PlayerCubeRotation.DragDirection.Right:

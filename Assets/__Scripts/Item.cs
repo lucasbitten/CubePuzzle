@@ -5,21 +5,35 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class Item : MonoBehaviour
 {
+    //todo: fix item not attaching to correct face
 
     [SerializeField] Rigidbody m_myRigidbody;
 
     public bool m_falling;
-    public bool m_locked;
     public bool m_beingCarried;
 
     [SerializeField] GameEvent_Void m_onRotationEnded;
     [SerializeField] GameEvent_Void m_onRotationStarted;
 
-    public LayerMask m_raycastLayer;
-    
+
+    [SerializeField] float m_collisionRadius;
+    public LayerMask m_objectsToAttachLayer;
+
+    [SerializeField] Transform m_currentParent;
+
+
     private void Start()
     {
         Physics.IgnoreLayerCollision(9,10);
+
+        var hitColliders = Physics.OverlapSphere(transform.position, m_collisionRadius, m_objectsToAttachLayer.value);
+        foreach (var hit in hitColliders)
+        {
+            if(hit.transform != transform)
+            {
+                AttachToObject(hit.transform);
+            }
+        }
     }
 
     private void OnEnable()
@@ -50,89 +64,63 @@ public class Item : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.yellow;
-        Ray ray = new Ray(transform.position, Vector3.down);
-        Gizmos.DrawRay(ray);
+        Gizmos.color = Color.yellow;        
+        Gizmos.DrawWireSphere(transform.position, m_collisionRadius);
     }
 
     public void UnlockMovement()
     {
-        ClearConstraints();
-        Ray ray = new Ray(transform.position, Vector3.down);
-        Physics.Raycast(ray, out RaycastHit hit, 0.5f, m_raycastLayer);
-        
-        if(hit.collider)
+        if(m_currentParent != null && m_currentParent.TryGetComponent(out MoveableFace face))
         {
-            if (hit.collider.CompareTag("Obstacles") || hit.collider.CompareTag("Faces"))
+            if(face.CurrentFacePosition != MoveableFace.FacePosition.Bottom)
             {
+                DetachItem();
+                m_falling = true;
+            }
+        }
+    }
+
+    private void Update()
+    {
+        var hitColliders = Physics.OverlapSphere(transform.position, m_collisionRadius, m_objectsToAttachLayer.value);
+        foreach (var hit in hitColliders)
+        {
+            if (hit.transform == transform || hit.transform == m_currentParent)
+            {
+                continue;
+            }
+
+            if (m_falling)
+            {
+                if(hit.gameObject.CompareTag("Faces"))
+                {
+                    var face = hit.gameObject.GetComponent<MoveableFace>();
+                    if (face && face.CurrentFacePosition == MoveableFace.FacePosition.Bottom)
+                    {
+                        AttachToObject(hit.transform);
+                    }
+                }
+                else if (hit.gameObject.CompareTag("Items") || hit.gameObject.CompareTag("Obstacles"))
+                {
+                    AttachToObject(hit.transform);
+                }
+
                 m_falling = false;
-                Debug.LogWarning("Not Falling");
-            }
-            else if (hit.collider.CompareTag("Items"))
-            {
-                //Check if item is above other item
-                Physics.Raycast(hit.collider.transform.position, Vector3.down, out RaycastHit itemHit, 0.5f, m_raycastLayer);
-                if (itemHit.collider && (itemHit.collider.CompareTag("Obstacles") || itemHit.collider.CompareTag("Faces")))
-                {
-                    m_falling = false;
-                    Debug.LogWarning("Not Falling too");
 
-                }
-                else
-                {
-                    m_falling = true;
-                    Debug.LogWarning("Faaaalling");
+                m_myRigidbody.constraints = RigidbodyConstraints.FreezeRotation;
 
-                }
+                var vec = transform.eulerAngles;
+                vec.x = Mathf.Round(vec.x / 90) * 90;
+                vec.y = Mathf.Round(vec.y / 90) * 90;
+                vec.z = Mathf.Round(vec.z / 90) * 90;
+                transform.eulerAngles = vec;
             }
         }
-        else
-        {
-            m_falling = true;
-            Debug.LogWarning("Falling");
 
-        }
-
-        m_locked = false;        
     }
 
     private void OnCollisionEnter(Collision other)
     {
-        if(m_falling)
-        {
-            if(other.gameObject.CompareTag("Items"))
-            {   
-                if (other.transform.parent)
-                {
-                    AttachToObject(other.transform.parent.transform);
-                } 
-                else
-                {
-                    //transform.parent = cube.transform;
-                }
-                m_locked = false;
-                m_falling = false;
-            } 
-
-            m_myRigidbody.constraints = RigidbodyConstraints.FreezeRotation;
-
-            var vec = transform.eulerAngles;
-            vec.x = Mathf.Round(vec.x / 90) * 90;
-            vec.y = Mathf.Round(vec.y / 90) * 90;
-            vec.z = Mathf.Round(vec.z / 90) * 90;
-            transform.eulerAngles = vec;
-        }
-        else
-        {
-            if (other.gameObject.CompareTag("Items"))
-            {
-                if (transform.position.y > other.transform.position.y)
-                {
-                    AttachToObject(other.transform.parent);
-                }
-            }
-        }
-
         if(m_beingCarried)
         {
             if (!other.gameObject.CompareTag("Player"))
@@ -140,29 +128,19 @@ public class Item : MonoBehaviour
                 // pickupItem.Drop();
             }
         }
-
-        if(other.gameObject.CompareTag("Faces"))
-        {
-            var face = other.gameObject.GetComponent<MoveableFace>();
-
-            if (face && face.CurrentFacePosition == MoveableFace.FacePosition.Bottom)
-            {
-                AttachToObject(other.transform);
-                m_falling = false;
-                m_locked = false;
-            }
-        }
     }
 
-    public void ClearConstraints()
+    public void DetachItem()
     {
         m_myRigidbody.constraints = RigidbodyConstraints.None;
+        transform.SetParent(transform.root);
     }
 
-    public void AttachToObject(Transform transform, bool lockConstraints = true)
+    public void AttachToObject(Transform parent, bool lockConstraints = true)
     {
-        transform.SetParent(transform);
-        if(lockConstraints )
+        m_currentParent = parent;
+        transform.SetParent(parent);
+        if(lockConstraints)
         {
             LockMovement();
         }

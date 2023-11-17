@@ -37,9 +37,6 @@ public class LevelManager : ScriptableObject
         m_forceField = forceFieldCube;
     }
 
-
-
-
     public void CheckSwitches(){
 
         for (int i = 0; i < m_levelSwitches.Length; i++)
