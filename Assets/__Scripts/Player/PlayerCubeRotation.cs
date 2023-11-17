@@ -7,6 +7,7 @@ public class PlayerCubeRotation : MonoBehaviour
 {
     public enum DragDirection
     {
+        None,
         Up,
         Down,
         Right,
@@ -119,6 +120,7 @@ public class PlayerCubeRotation : MonoBehaviour
             }
             else
             {
+                m_crosshairManager.SetRotation(DragDirection.None, 0, null);
                 m_crosshairManager.ResetColors();
             }
         }

@@ -43,6 +43,7 @@ public class CrosshairManager : ScriptableObject
 
     public void SetRotation(PlayerCubeRotation.DragDirection rotationDirection, float dragDistance, MoveableFace selectedFace)
     {
+
         int steps = Mathf.RoundToInt(Mathf.Abs(dragDistance / m_mouseDragStep));
         if (steps > 2) 
         { 
@@ -52,6 +53,7 @@ public class CrosshairManager : ScriptableObject
 
         if (steps == 0)
         {
+            m_cubeManager.SetRotationInfo(null);
             return;
         }
 
