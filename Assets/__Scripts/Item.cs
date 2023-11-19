@@ -78,21 +78,26 @@ public class Item : MonoBehaviour
                 m_falling = true;
             }
         }
+        else if(m_currentParent.gameObject.layer == LayerMask.NameToLayer("Obstacle") && m_currentParent.transform.position.y > transform.position.y)
+        {
+            DetachItem();
+            m_falling = true;
+        }
     }
 
     private void Update()
     {
-        var hitColliders = Physics.OverlapSphere(transform.position, m_collisionRadius, m_objectsToAttachLayer.value);
-        foreach (var hit in hitColliders)
+        if (m_falling)
         {
-            if (hit.transform == transform || hit.transform == m_currentParent)
+            var hitColliders = Physics.OverlapSphere(transform.position, m_collisionRadius, m_objectsToAttachLayer.value);
+            foreach (var hit in hitColliders)
             {
-                continue;
-            }
+                if (hit.transform == transform || hit.transform == m_currentParent)
+                {
+                    continue;
+                }
 
-            if (m_falling)
-            {
-                if(hit.gameObject.CompareTag("Faces"))
+                if (hit.gameObject.CompareTag("Faces"))
                 {
                     var face = hit.gameObject.GetComponent<MoveableFace>();
                     if (face && face.CurrentFacePosition == MoveableFace.FacePosition.Bottom)
@@ -105,18 +110,10 @@ public class Item : MonoBehaviour
                     AttachToObject(hit.transform);
                 }
 
-                m_falling = false;
 
-                m_myRigidbody.constraints = RigidbodyConstraints.FreezeRotation;
 
-                var vec = transform.eulerAngles;
-                vec.x = Mathf.Round(vec.x / 90) * 90;
-                vec.y = Mathf.Round(vec.y / 90) * 90;
-                vec.z = Mathf.Round(vec.z / 90) * 90;
-                transform.eulerAngles = vec;
             }
         }
-
     }
 
     private void OnCollisionEnter(Collision other)
@@ -138,6 +135,16 @@ public class Item : MonoBehaviour
 
     public void AttachToObject(Transform parent, bool lockConstraints = true)
     {
+        m_falling = false;
+
+        m_myRigidbody.constraints = RigidbodyConstraints.FreezeRotation; 
+
+        var vec = transform.eulerAngles;
+        vec.x = Mathf.Round(vec.x / 90) * 90;
+        vec.y = Mathf.Round(vec.y / 90) * 90;
+        vec.z = Mathf.Round(vec.z / 90) * 90;
+        transform.eulerAngles = vec;
+
         m_currentParent = parent;
         transform.SetParent(parent);
         if(lockConstraints)
