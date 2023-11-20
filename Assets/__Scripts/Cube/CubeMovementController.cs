@@ -193,7 +193,7 @@ public class CubeMovementController : MonoBehaviour
 
         for ( int i = 0; i < m_items.Count; ++i ) 
         {
-            if (m_items[i].m_falling) 
+            if (m_items[i].ItemCurrentState == Item.ItemState.Falling) 
             {
                 return true;
             }
