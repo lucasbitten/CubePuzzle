@@ -16,16 +16,16 @@ public class MoveableFace : MonoBehaviour
         Back
     }
 
-    [SerializeField] GameEvent_Void m_onFaceMovementEnded;
-    [SerializeField] GameEvent_Void m_onDragEnded;
+    [SerializeField] GameEvent_Void m_onFaceMovementEndedEvent;
+    [SerializeField] GameEvent_Void m_onDragEndedEvent;
     [SerializeField] Renderer m_renderer;
-
     [SerializeField] CubeMovementController m_cube;
-    public Vector3 m_targetLocation;
 
     [field: SerializeField] public FacePosition CurrentFacePosition { get; private set; }
     [field: SerializeField] public FacePosition NextPosition { get; private set; }
+
     Transform m_moveableFacesParent;
+    public Vector3 m_targetLocation;
 
 
     MaterialPropertyBlock m_selectedMaterialPropertyBlock;
@@ -45,12 +45,12 @@ public class MoveableFace : MonoBehaviour
 
     private void OnEnable()
     {
-        m_onDragEnded.EventListeners += OnDragEnded;
+        m_onDragEndedEvent.EventListeners += OnDragEnded;
     }
 
     private void OnDisable()
     {
-        m_onDragEnded.EventListeners -= OnDragEnded;
+        m_onDragEndedEvent.EventListeners -= OnDragEnded;
     }
 
 
@@ -75,7 +75,7 @@ public class MoveableFace : MonoBehaviour
         Debug.Log($"Gather Position {m_targetLocation}");
 
         yield return StartCoroutine(AssembleFaces()); // Moving faces back to main cube
-        m_onFaceMovementEnded.Raise();
+        m_onFaceMovementEndedEvent.Raise();
     }
 
 

@@ -18,8 +18,8 @@ public class PlayerCubeRotation : MonoBehaviour
 
     [SerializeField] CubeManager m_cubeManager;
     [SerializeField] CrosshairManager m_crosshairManager;
-    [SerializeField] GameEvent_Void m_onDragStarted;
-    [SerializeField] GameEvent_Void m_onDragEnded;
+    [SerializeField] GameEvent_Void m_onDragStartedEvent;
+    [SerializeField] GameEvent_Void m_onDragEndedEvent;
     [SerializeField] Transform m_playerCamera;
 
 
@@ -61,7 +61,7 @@ public class PlayerCubeRotation : MonoBehaviour
 
                 m_crosshairManager.ShowCrosshair(true);
                 m_initialDragPosition = Input.mousePosition;
-                m_onDragStarted.Raise();
+                m_onDragStartedEvent.Raise();
 
                 Debug.Log($"Hit Face {hit.collider.name}");
                 if (dragEnabled)
@@ -78,7 +78,7 @@ public class PlayerCubeRotation : MonoBehaviour
             Cursor.lockState = CursorLockMode.Locked;
 
             m_crosshairManager.ShowCrosshair(false);
-            m_onDragEnded.Raise();
+            m_onDragEndedEvent.Raise();
         }
 
         if(Input.GetMouseButton(1))

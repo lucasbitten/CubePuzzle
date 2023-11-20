@@ -14,7 +14,8 @@ public class Item : MonoBehaviour
         BeingCarried,
         OnObstacle,
         OnItem,
-        OnBottom
+        OnBottom,
+        OnItemHolder
     }
 
 
@@ -22,15 +23,17 @@ public class Item : MonoBehaviour
 
     [SerializeField] Rigidbody m_myRigidbody;
 
-    [SerializeField] GameEvent_Void m_onRotationEnded;
-    [SerializeField] GameEvent_Void m_onRotationStarted;
+    [SerializeField] GameEvent_Void m_onRotationStartedEvent;
+    [SerializeField] GameEvent_Void m_onRotationEndedEvent;
 
 
     [SerializeField] float m_collisionRadius;
     [SerializeField] LayerMask m_objectsToAttachLayer;
 
-    [SerializeField] Transform m_currentParent;
+    [SerializeField] Transform m_objectToAttach;
     [field: SerializeField] public ItemState ItemCurrentState { get; private set; } = ItemState.Invalid;
+
+    bool m_lockMovement;
 
     private void Start()
     {
@@ -40,14 +43,14 @@ public class Item : MonoBehaviour
 
     private void OnEnable()
     {
-        m_onRotationStarted.EventListeners += OnRotationStarted;
-        m_onRotationEnded.EventListeners += OnRotationEnded;
+        m_onRotationStartedEvent.EventListeners += OnRotationStarted;
+        m_onRotationEndedEvent.EventListeners += OnRotationEnded;
     }
 
     private void OnDisable()
     {
-        m_onRotationStarted.EventListeners -= OnRotationStarted;
-        m_onRotationEnded.EventListeners -= OnRotationEnded;
+        m_onRotationStartedEvent.EventListeners -= OnRotationStarted;
+        m_onRotationEndedEvent.EventListeners -= OnRotationEnded;
     }
 
     private void OnRotationEnded(Void args)
@@ -67,23 +70,29 @@ public class Item : MonoBehaviour
 
     public void LockMovement()
     {
-        m_myRigidbody.constraints = RigidbodyConstraints.FreezeAll;   
+        m_myRigidbody.constraints = RigidbodyConstraints.FreezeAll;    
     }
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.yellow;        
-        Gizmos.DrawWireSphere(transform.position, m_collisionRadius);
+        //Gizmos.color = Color.yellow;        
+        //Gizmos.DrawWireSphere(transform.position, m_collisionRadius);
+        var ray = new Ray(transform.position, Vector3.down);
+        Debug.DrawRay(ray.origin, ray.direction * 0.5f, Color.yellow);
     }
 
     public void UnlockMovement()
     {
-        if(m_currentParent != null && m_currentParent.TryGetComponent(out MoveableFace face))
+        if(ItemCurrentState == ItemState.OnItemHolder)
+        {
+            return;
+        }
+
+        if(m_objectToAttach != null && m_objectToAttach.TryGetComponent(out MoveableFace face))
         {
             if(face.CurrentFacePosition != MoveableFace.FacePosition.Bottom)
             {
                 DetachItem();
-                ItemCurrentState = ItemState.Falling;
             }
         }
         else
@@ -94,10 +103,15 @@ public class Item : MonoBehaviour
 
     private void Update()
     {
+        if (ItemCurrentState == ItemState.OnItemHolder)
+        {
+            return;
+        }
+
         CheckWhereItemHasFallen();
     }
 
-    public void CheckUnderneath()
+    public bool CheckCollision()
     {
         var ray = new Ray(transform.position, Vector3.down);
         if (Physics.Raycast(ray, out RaycastHit hitInfo, 0.5f, m_objectsToAttachLayer))
@@ -110,18 +124,30 @@ public class Item : MonoBehaviour
                     if (hitGameObject.transform != transform)
                     {
                         AttachToObject(hitGameObject.transform, ItemState.OnBottom);
+                        return true;
                     }
                 }
             }
-            else if (hitGameObject.layer == LayerMask.NameToLayer("Obstacle"))
+            else if (hitGameObject.CompareTag("Obstacles"))
             {
                 AttachToObject(hitGameObject.transform, ItemState.OnObstacle);
+                return true;
+
+            }
+            else if (hitGameObject.gameObject.CompareTag("Items"))
+            {
+                AttachToObject(hitGameObject.transform, ItemState.OnItem);
+                return true;
             }
         }
-        else
+        return false;
+    }
+
+    public void CheckUnderneath()
+    {
+        if(!CheckCollision())
         {
             DetachItem();
-            ItemCurrentState = ItemState.Falling;
         }
     }
 
@@ -129,37 +155,32 @@ public class Item : MonoBehaviour
     {
         if (ItemCurrentState == ItemState.Falling)
         {
-            var hitColliders = Physics.OverlapSphere(transform.position, m_collisionRadius, m_objectsToAttachLayer.value);
-            foreach (var hit in hitColliders)
-            {
-                if (hit.transform == transform || hit.transform == m_currentParent)
-                {
-                    continue;
-                }
-
-                if (hit.gameObject.CompareTag("Faces"))
-                {
-                    var face = hit.gameObject.GetComponent<MoveableFace>();
-                    if (face && face.CurrentFacePosition == MoveableFace.FacePosition.Bottom)
-                    {
-                        AttachToObject(hit.transform, ItemState.OnBottom);
-                    }
-                }
-                else if (hit.gameObject.CompareTag("Items"))
-                {
-                    AttachToObject(hit.transform, ItemState.OnItem);
-
-                }
-                else if (hit.gameObject.CompareTag("Obstacles"))
-                {
-                    AttachToObject(hit.transform, ItemState.OnObstacle);
-                }
-            }
+            CheckCollision();
         }
     }
 
     private void OnCollisionEnter(Collision other)
     {
+        if(m_objectToAttach != null)
+        {
+            if (other.gameObject == m_objectToAttach.gameObject)
+            {
+                m_myRigidbody.constraints = RigidbodyConstraints.FreezeRotation;
+
+                var vec = transform.eulerAngles;
+                vec.x = Mathf.Round(vec.x / 90) * 90;
+                vec.y = Mathf.Round(vec.y / 90) * 90;
+                vec.z = Mathf.Round(vec.z / 90) * 90;
+                transform.eulerAngles = vec;
+
+                transform.SetParent(m_objectToAttach);
+                if (m_lockMovement)
+                {
+                    LockMovement();
+                }
+            }
+        }
+
         if(ItemCurrentState == ItemState.BeingCarried)
         {
             if (!other.gameObject.CompareTag("Player"))
@@ -171,27 +192,17 @@ public class Item : MonoBehaviour
 
     public void DetachItem()
     {
+        ItemCurrentState = ItemState.Falling;
         m_myRigidbody.constraints = RigidbodyConstraints.None;
         transform.SetParent(transform.root);
+        m_objectToAttach = null;
     }
 
     public void AttachToObject(Transform parent, ItemState itemState, bool lockConstraints = true)
     {
         ItemCurrentState = itemState;
-        m_myRigidbody.constraints = RigidbodyConstraints.FreezeRotation; 
-
-        var vec = transform.eulerAngles;
-        vec.x = Mathf.Round(vec.x / 90) * 90;
-        vec.y = Mathf.Round(vec.y / 90) * 90;
-        vec.z = Mathf.Round(vec.z / 90) * 90;
-        transform.eulerAngles = vec;
-
-        m_currentParent = parent;
-        transform.SetParent(parent);
-        if(lockConstraints)
-        {
-            LockMovement();
-        }
+        m_objectToAttach = parent;
+        m_lockMovement = lockConstraints;
     }
 
 

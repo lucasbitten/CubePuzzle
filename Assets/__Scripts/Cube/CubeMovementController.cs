@@ -35,11 +35,11 @@ public class CubeMovementController : MonoBehaviour
     [SerializeField] GameObject m_facesYRotator = default;
     [SerializeField] GameObject m_facesZRotator = default;
 
-    [SerializeField] GameEvent_Void m_onRotationStarted;
-    [SerializeField] GameEvent_Void m_onRotationEnded;
-    [SerializeField] GameEvent_Int m_onFacesStartedRotating;
-    [SerializeField] GameEvent_Void m_onFaceMovementEnded;
-    [SerializeField] GameEvent_Void m_onDragEnded;
+    [SerializeField] GameEvent_Void m_onRotationStartedEvent;
+    [SerializeField] GameEvent_Void m_onRotationEndedEvent;
+    [SerializeField] GameEvent_Int m_onFacesStartedRotatingEvent;
+    [SerializeField] GameEvent_Void m_onFaceMovementEndedEvent;
+    [SerializeField] GameEvent_Void m_onDragEndedEvent;
 
     [field: SerializeField] public List<MoveableFace> Faces { get; private set; } = new List<MoveableFace>();
 
@@ -66,19 +66,19 @@ public class CubeMovementController : MonoBehaviour
 
     private void OnEnable()
     {
-        m_onRotationEnded.EventListeners += OnRotationEnded;
-        m_onRotationStarted.EventListeners += OnRotationStarted;
-        m_onFacesStartedRotating.EventListeners += OnFacesStartedRotating;
-        m_onFaceMovementEnded.EventListeners += OnFaceMovementEnded;
-        m_onDragEnded.EventListeners += OnDragEnded;
+        m_onRotationEndedEvent.EventListeners += OnRotationEnded;
+        m_onRotationStartedEvent.EventListeners += OnRotationStarted;
+        m_onFacesStartedRotatingEvent.EventListeners += OnFacesStartedRotating;
+        m_onFaceMovementEndedEvent.EventListeners += OnFaceMovementEnded;
+        m_onDragEndedEvent.EventListeners += OnDragEnded;
     }
     private void OnDisable()
     {
-        m_onRotationEnded.EventListeners -= OnRotationEnded;
-        m_onRotationStarted.EventListeners -= OnRotationStarted;
-        m_onFacesStartedRotating.EventListeners -= OnFacesStartedRotating;
-        m_onFaceMovementEnded.EventListeners -= OnFaceMovementEnded;
-        m_onDragEnded.EventListeners -= OnDragEnded;
+        m_onRotationEndedEvent.EventListeners -= OnRotationEnded;
+        m_onRotationStartedEvent.EventListeners -= OnRotationStarted;
+        m_onFacesStartedRotatingEvent.EventListeners -= OnFacesStartedRotating;
+        m_onFaceMovementEndedEvent.EventListeners -= OnFaceMovementEnded;
+        m_onDragEndedEvent.EventListeners -= OnDragEnded;
     }
 
     private void OnFaceMovementEnded(Void arg)
@@ -87,7 +87,7 @@ public class CubeMovementController : MonoBehaviour
 
         if(m_facesRotating == 0)
         {
-            m_onRotationEnded.Raise();
+            m_onRotationEndedEvent.Raise();
         }
 
     }
@@ -114,7 +114,7 @@ public class CubeMovementController : MonoBehaviour
     }
     public void InvokeOnRotationEnded()
     {
-        m_onRotationEnded.Raise();
+        m_onRotationEndedEvent.Raise();
     }
     private void OnDragEnded(Void args)
     {

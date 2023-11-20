@@ -146,14 +146,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb9d8249d15298549b76c58278e71ff5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_falling: 0
-  m_beingCarried: 0
-  m_rotating: 0
-  m_onRotationEnded: {fileID: 0}
-  m_onRotationStarted: {fileID: 0}
-  m_raycastLayer:
+  m_myRigidbody: {fileID: 0}
+  m_onRotationEndedEvent: {fileID: 0}
+  m_onRotationStartedEvent: {fileID: 0}
+  m_collisionRadius: 0
+  m_objectsToAttachLayer:
     serializedVersion: 2
     m_Bits: 0
+  m_objectToAttach: {fileID: 0}
+  <ItemCurrentState>k__BackingField: -1
 --- !u!1 &137583273318328544
 GameObject:
   m_ObjectHideFlags: 0
@@ -3973,14 +3974,15 @@ MonoBehaviour:
   m_facesXRotator: {fileID: 1965480439891062589}
   m_facesYRotator: {fileID: 4711160390150003572}
   m_facesZRotator: {fileID: 4366586496702690417}
-  m_onRotationStarted: {fileID: 11400000, guid: b85dc40c0d8684b4ebc6e8d181eba9f5,
+  m_onRotationStartedEvent: {fileID: 11400000, guid: b85dc40c0d8684b4ebc6e8d181eba9f5,
     type: 2}
-  m_onRotationEnded: {fileID: 11400000, guid: 74509c6793650a846b25d3e82c757c5f, type: 2}
-  m_onFacesStartedRotating: {fileID: 11400000, guid: acd121c3d8087c744b2dc94b021617c2,
+  m_onRotationEndedEvent: {fileID: 11400000, guid: 74509c6793650a846b25d3e82c757c5f,
     type: 2}
-  m_onFaceMovementEnded: {fileID: 11400000, guid: 2cb3254fc115e7642a051f1338a688f3,
+  m_onFacesStartedRotatingEvent: {fileID: 11400000, guid: acd121c3d8087c744b2dc94b021617c2,
     type: 2}
-  m_onDragEnded: {fileID: 11400000, guid: 966cd6bc92e247c4084466e28235257f, type: 2}
+  m_onFaceMovementEndedEvent: {fileID: 11400000, guid: 2cb3254fc115e7642a051f1338a688f3,
+    type: 2}
+  m_onDragEndedEvent: {fileID: 11400000, guid: 966cd6bc92e247c4084466e28235257f, type: 2}
   <Faces>k__BackingField:
   - {fileID: 1716259002271466334}
   - {fileID: 1965480438786344532}

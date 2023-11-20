@@ -10,5 +10,5 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ba2da9a1a5404534bbab9366adb04466, type: 3}
-  m_Name: OnFaceMovementEnded
+  m_Name: OnDragEndedEvent
   m_EditorClassIdentifier: 

@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class MouseLook : MonoBehaviour
 {
-    [SerializeField] GameEvent_Void m_onDragStarted;
-    [SerializeField] GameEvent_Void m_onDragEnded;
+    [SerializeField] GameEvent_Void m_onDragStartedEvent;
+    [SerializeField] GameEvent_Void m_onDragEndedEvent;
     [SerializeField] Transform m_player = default;
 
     [SerializeField] float m_sensitivity = 5f;
@@ -18,8 +18,8 @@ public class MouseLook : MonoBehaviour
 
     private void Awake()
     {
-        m_onDragStarted.EventListeners += OnDragStarted;
-        m_onDragEnded.EventListeners += OnDragEnded;
+        m_onDragStartedEvent.EventListeners += OnDragStarted;
+        m_onDragEndedEvent.EventListeners += OnDragEnded;
     }
 
     private void OnDragEnded(Void obj)

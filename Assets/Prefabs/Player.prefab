@@ -61,7 +61,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 56f49570f193dc749bd03672d8d27bdc, type: 2}
+  - {fileID: 2100000, guid: 04746e774ff520c4aaf6955483049c10, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -189,8 +189,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 835e0500c76734d4dad9554a58d7be69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_onDragStarted: {fileID: 11400000, guid: 5026910e8b6dcc543a5e4809568f036a, type: 2}
-  m_onDragEnded: {fileID: 11400000, guid: 966cd6bc92e247c4084466e28235257f, type: 2}
+  m_onDragStartedEvent: {fileID: 11400000, guid: 5026910e8b6dcc543a5e4809568f036a,
+    type: 2}
+  m_onDragEndedEvent: {fileID: 11400000, guid: 966cd6bc92e247c4084466e28235257f, type: 2}
   m_player: {fileID: 3313259218526349876}
   m_sensitivity: 5
   m_xRotation: 0
@@ -405,15 +406,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32120264b098d5a488f52da4baa4babf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxDistanceToPickUp: 1.5
-  canHold: 1
-  item: {fileID: 0}
-  tempParent: {fileID: 8661718320921898059}
-  isHolding: 0
-  itemLayer:
+  m_maxDistanceToPickUp: 1.5
+  m_canHold: 1
+  m_item: {fileID: 0}
+  m_tempParent: {fileID: 8661718320921898059}
+  m_isHolding: 0
+  m_itemLayer:
     serializedVersion: 2
     m_Bits: 512
-  dropDistance: 1
+  m_dropDistance: 1
+  m_onItemPickedUpEvent: {fileID: 11400000, guid: 40be400c4d3c5df4187771c2df6df043,
+    type: 2}
 --- !u!114 &6113163085328966221
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -431,8 +434,9 @@ MonoBehaviour:
     m_Bits: 8192
   m_cubeManager: {fileID: 11400000, guid: 33a1a4b1d156da44ba0d144d3f2ab919, type: 2}
   m_crosshairManager: {fileID: 11400000, guid: 2143cab4931b77d4a98251f335e07526, type: 2}
-  m_onDragStarted: {fileID: 11400000, guid: 5026910e8b6dcc543a5e4809568f036a, type: 2}
-  m_onDragEnded: {fileID: 11400000, guid: 966cd6bc92e247c4084466e28235257f, type: 2}
+  m_onDragStartedEvent: {fileID: 11400000, guid: 5026910e8b6dcc543a5e4809568f036a,
+    type: 2}
+  m_onDragEndedEvent: {fileID: 11400000, guid: 966cd6bc92e247c4084466e28235257f, type: 2}
   m_playerCamera: {fileID: 2581935366134760560}
 --- !u!1 &8661718320921898059
 GameObject:

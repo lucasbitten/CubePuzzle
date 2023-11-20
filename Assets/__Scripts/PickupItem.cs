@@ -8,38 +8,37 @@ public class PickupItem : MonoBehaviour
     //TODO: corrigir comprotamento enquanto esta sendo carregado
 
 
-    Vector3 objectPos;
-    float distance;
+    [SerializeField] float m_maxDistanceToPickUp = 1;
+    [SerializeField] bool m_canHold = true;
+    [SerializeField] GameObject m_item;
+    [SerializeField] GameObject m_tempParent;
+    [SerializeField] bool m_isHolding = false;
+    [SerializeField] LayerMask m_itemLayer;
+    [SerializeField] float m_dropDistance = 1;
 
-    public float maxDistanceToPickUp = 1;
-    public bool canHold = true;
-    public GameObject item;
-    public GameObject tempParent;
-    public bool isHolding = false;
-    private Collider[] overlapResults = new Collider[10];
-    [SerializeField]
-    LayerMask itemLayer;
-    CubeMovementController cube;
+    [SerializeField] GameEvent_GameObject m_onItemPickedUpEvent;
 
-    [SerializeField]
-    float dropDistance = 1;
 
-    private void Awake() {
-        cube = FindObjectOfType<CubeMovementController>();
-    }
+    private Collider[] m_overlapResults = new Collider[10];
+    Vector3 m_objectPos;
+    float m_distance;
+
+    Rigidbody m_itemRigibody;
+
+
 
     private void OnDrawGizmos() {
         
-        Gizmos.DrawWireSphere(tempParent.transform.position,1);
-
+        Gizmos.DrawWireSphere(m_tempParent.transform.position,1);
     }
+
 
     private void Update() 
     {
         if (Input.GetKeyDown(KeyCode.G)) 
         {
 
-            if (isHolding == false) 
+            if (m_isHolding == false) 
             {
                 PickUp();
             } else
@@ -50,15 +49,18 @@ public class PickupItem : MonoBehaviour
         }
 
 
-        if(isHolding)
+        if(m_isHolding)
         {
-            distance = Vector3.Distance(item.transform.position, tempParent.transform.position);
-            item.transform.SetParent(tempParent.transform);
+            m_distance = Vector3.Distance(m_item.transform.position, m_tempParent.transform.position);
+            m_item.transform.SetParent(m_tempParent.transform);
+            if (m_itemRigibody != null)
+            {
+                m_itemRigibody.velocity = Vector3.zero;
+                m_itemRigibody.angularVelocity = Vector3.zero;
+            }
 
-            item.GetComponent<Rigidbody>().velocity = Vector3.zero;
-            item.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-
-            if(distance >= dropDistance){
+            if(m_distance >= m_dropDistance)
+            {
                 Drop();
             }
 
@@ -69,62 +71,78 @@ public class PickupItem : MonoBehaviour
 
     void PickUp(){
 
-        if (isHolding == false) 
+        if (m_isHolding == false) 
         {
-            int numFound = Physics.OverlapSphereNonAlloc(tempParent.transform.position,1, overlapResults,itemLayer);
+            int numFound = Physics.OverlapSphereNonAlloc(m_tempParent.transform.position,1, m_overlapResults,m_itemLayer);
 
-            if(numFound == 0){
+            if(numFound == 0)
+            {
                 return;
             }
 
-            item = overlapResults[0].gameObject;
-            for (int i = 0; i < numFound; i++) {
-                if (item.transform.position.y < overlapResults[i].transform.position.y){
-                    item = overlapResults[i].gameObject;
+            m_item = m_overlapResults[0].gameObject;
+            for (int i = 0; i < numFound; i++) 
+            {
+                if (m_item.transform.position.y < m_overlapResults[i].transform.position.y)
+                {
+                    m_item = m_overlapResults[i].gameObject;
                 }
                 else
                 {
-                    if (Vector3.Distance(item.transform.position, transform.position) > Vector3.Distance(overlapResults[i].transform.position, transform.position) ){
-                        item = overlapResults[i].gameObject;
+                    if (Vector3.Distance(m_item.transform.position, transform.position) > Vector3.Distance(m_overlapResults[i].transform.position, transform.position))
+                    {
+                        m_item = m_overlapResults[i].gameObject;
                     }
                 }
             }
-            
-            distance = Vector3.Distance(item.transform.position, tempParent.transform.position);
 
-            if (distance <= maxDistanceToPickUp) 
+            m_itemRigibody = m_item.GetComponent<Rigidbody>();
+            m_distance = Vector3.Distance(m_item.transform.position, m_tempParent.transform.position);
+
+            if (m_distance <= m_maxDistanceToPickUp) 
             {
-                item.GetComponent<Rigidbody>().useGravity = false;
+                if(m_itemRigibody != null)
+                {
+                    m_itemRigibody.useGravity = false;
 
-                StartCoroutine(MoveItem(tempParent.transform.position));
-                item.GetComponent<Rigidbody>().detectCollisions = true;
+                    StartCoroutine(MoveItem(m_tempParent.transform.position));
+                    m_itemRigibody.detectCollisions = true;
+                }
             }
         }
     }
 
     public void Drop(){
         
-        isHolding = false; 
-        item.GetComponent<Item>().SetState(Item.ItemState.Falling);
-        objectPos = item.transform.position;
-        item.GetComponent<Rigidbody>().useGravity = true;
-        item.transform.position = objectPos;
+        m_isHolding = false;
+        var item = m_item.GetComponent<Item>();
+        if (item != null)
+        {
+            item.DetachItem();
+        }
 
+        if (m_itemRigibody != null)
+        {
+            m_itemRigibody.useGravity = true;
+        }
+
+        m_item = null;
     }
 
     IEnumerator MoveItem(Vector3 position){
         float elapsedTime = 0;
 
-        while (Vector3.Distance(item.transform.position, position) > 0.4f )
+        while (Vector3.Distance(m_item.transform.position, position) > 0.4f )
         {
             elapsedTime += Time.deltaTime;
 
-            item.transform.position = Vector3.Slerp(item.transform.position, position, elapsedTime/2);
+            m_item.transform.position = Vector3.Slerp(m_item.transform.position, position, elapsedTime/2);
             yield return null;
 
         }
 
-        isHolding = true;
+        m_onItemPickedUpEvent.Raise(m_item.gameObject);
+        m_isHolding = true;
 
     }
 }

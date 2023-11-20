@@ -8,10 +8,10 @@ using static CubeMovementController;
 [CreateAssetMenu(menuName = "Managers/Cube Manager")]
 public class CubeManager : ScriptableObject
 {
-    [SerializeField] GameEvent_Void m_onRotationEnded;
-    [SerializeField] GameEvent_Void m_onRotationStarted;
-    [SerializeField] GameEvent_Void m_onDragEnded;
-    [SerializeField] GameEvent_Int m_onFacesStartedRotating;
+    [SerializeField] GameEvent_Void m_onRotationStartedEvent;
+    [SerializeField] GameEvent_Void m_onRotationEndedEvent;
+    [SerializeField] GameEvent_Int m_onFacesStartedRotatingEvent;
+    [SerializeField] GameEvent_Void m_onDragEndedEvent;
 
     [SerializeField] List<MoveableFace> m_faces = new List<MoveableFace>();
     [field: SerializeField] public float DistanceToMove { get; private set; } = 10;
@@ -43,13 +43,13 @@ public class CubeManager : ScriptableObject
 
     public void RotateCube(RotationInfo rotationInfo)
     {
-        m_onRotationStarted.Raise();
+        m_onRotationStartedEvent.Raise();
         Transform facesRotationParent;
         List<MoveableFace.FacePosition> facesPositionsToMove;
         Vector3 axis;
         SelectFacesToRotate(rotationInfo.RotationType, rotationInfo.FacesToMove, out facesRotationParent, out facesPositionsToMove, out axis);
 
-        m_onFacesStartedRotating.Raise(facesPositionsToMove.Count);
+        m_onFacesStartedRotatingEvent.Raise(facesPositionsToMove.Count);
 
         foreach (MoveableFace face in m_faces)
         {
