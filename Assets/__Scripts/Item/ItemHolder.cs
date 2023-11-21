@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ItemHolder : MonoBehaviour
+public class ItemHolder : MonoBehaviour, IInteractable
 {
     [System.Serializable]
     public class HolderSpot
@@ -12,12 +12,16 @@ public class ItemHolder : MonoBehaviour
         public Transform LockedItemPosition; 
     }
 
-
+    [SerializeField] Collider m_holderCollider;
     [SerializeField] List<HolderSpot> m_holderSpots = new List<HolderSpot>();
     [SerializeField] GameEvent_GameObject m_onItemPickedUpEvent;
 
     int m_holderCapacity;
     int m_itemsCount;
+
+    public bool IsActive { get => m_isActive; set => m_isActive = value; }
+
+    private bool m_isActive;
 
     private void Awake()
     {
@@ -114,4 +118,14 @@ public class ItemHolder : MonoBehaviour
         }
     }
 
+    public void OnActivated()
+    {
+        m_holderCollider.enabled = true;
+    }
+
+    public void OnDeactivated()
+    {
+        UnlockAllItems();
+        m_holderCollider.enabled = false;
+    }
 }
