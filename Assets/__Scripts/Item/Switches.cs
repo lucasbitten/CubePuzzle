@@ -8,14 +8,16 @@ public class Switches : MonoBehaviour
     public bool pressed;
     void OnTriggerEnter(Collider other)
     {
-        if(other.tag == "Items"){
+        if (other.CompareTag("Items") || other.CompareTag("Player"))
+        { 
             pressed = true;
             m_levelManager.CheckSwitches();
         }
     }
     void OnTriggerExit(Collider other)
     {
-        if(other.tag == "Items"){
+        if (other.CompareTag("Items") || other.CompareTag("Player"))
+        { 
             pressed = false;
             m_levelManager.CheckSwitches();
         }

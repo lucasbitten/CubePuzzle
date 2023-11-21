@@ -146,6 +146,7 @@ MonoBehaviour:
   - LockedItemPosition: {fileID: 7241755740373076469}
   m_onItemPickedUpEvent: {fileID: 11400000, guid: 40be400c4d3c5df4187771c2df6df043,
     type: 2}
+  m_isActive: 1
 --- !u!1 &6143021005148246170
 GameObject:
   m_ObjectHideFlags: 0

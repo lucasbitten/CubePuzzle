@@ -15,13 +15,13 @@ public class ItemHolder : MonoBehaviour, IInteractable
     [SerializeField] Collider m_holderCollider;
     [SerializeField] List<HolderSpot> m_holderSpots = new List<HolderSpot>();
     [SerializeField] GameEvent_GameObject m_onItemPickedUpEvent;
+    [SerializeField] bool m_isActive;
 
     int m_holderCapacity;
     int m_itemsCount;
 
     public bool IsActive { get => m_isActive; set => m_isActive = value; }
 
-    private bool m_isActive;
 
     private void Awake()
     {
@@ -120,11 +120,13 @@ public class ItemHolder : MonoBehaviour, IInteractable
 
     public void OnActivated()
     {
+        m_isActive = true;
         m_holderCollider.enabled = true;
     }
 
     public void OnDeactivated()
     {
+        m_isActive = false;
         UnlockAllItems();
         m_holderCollider.enabled = false;
     }
