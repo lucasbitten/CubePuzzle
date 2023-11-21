@@ -9,27 +9,26 @@ public class PickupItem : MonoBehaviour
 
 
     [SerializeField] float m_maxDistanceToPickUp = 1;
-    [SerializeField] bool m_canHold = true;
-    [SerializeField] GameObject m_item;
-    [SerializeField] GameObject m_tempParent;
-    [SerializeField] bool m_isHolding = false;
-    [SerializeField] LayerMask m_itemLayer;
     [SerializeField] float m_dropDistance = 1;
+    [SerializeField] float m_currentItemDrag = 10f;
+    [SerializeField] Transform m_pickupParent;
+    [SerializeField] LayerMask m_itemLayer;
 
     [SerializeField] GameEvent_GameObject m_onItemPickedUpEvent;
 
 
-    private Collider[] m_overlapResults = new Collider[10];
-    Vector3 m_objectPos;
+    GameObject m_item;
+    bool m_isHolding = false;
     float m_distance;
 
     Rigidbody m_itemRigibody;
+    private float m_previousDrag;
 
 
 
     private void OnDrawGizmos() {
         
-        Gizmos.DrawWireSphere(m_tempParent.transform.position,1);
+        Gizmos.DrawWireSphere(m_pickupParent.transform.position,1);
     }
 
 
@@ -51,15 +50,15 @@ public class PickupItem : MonoBehaviour
 
         if(m_isHolding)
         {
-            m_distance = Vector3.Distance(m_item.transform.position, m_tempParent.transform.position);
-            m_item.transform.SetParent(m_tempParent.transform);
+            m_distance = Vector3.Distance(m_item.transform.position, m_pickupParent.transform.position);
+            m_item.transform.SetParent(m_pickupParent.transform);
             if (m_itemRigibody != null)
             {
                 m_itemRigibody.velocity = Vector3.zero;
                 m_itemRigibody.angularVelocity = Vector3.zero;
             }
 
-            if(m_distance >= m_dropDistance)
+            if (m_distance >= m_dropDistance)
             {
                 Drop();
             }
@@ -73,40 +72,22 @@ public class PickupItem : MonoBehaviour
 
         if (m_isHolding == false) 
         {
-            int numFound = Physics.OverlapSphereNonAlloc(m_tempParent.transform.position,1, m_overlapResults,m_itemLayer);
-
-            if(numFound == 0)
+            RaycastHit hit;
+            if(Physics.Raycast(m_pickupParent.position, m_pickupParent.TransformDirection(Vector3.forward), out hit, m_maxDistanceToPickUp,  m_itemLayer))
             {
-                return;
-            }
+                m_item = hit.collider.gameObject;  
 
-            m_item = m_overlapResults[0].gameObject;
-            for (int i = 0; i < numFound; i++) 
-            {
-                if (m_item.transform.position.y < m_overlapResults[i].transform.position.y)
+                m_itemRigibody = m_item.GetComponent<Rigidbody>();
+                m_distance = Vector3.Distance(m_item.transform.position, m_pickupParent.transform.position);
+
+                if (m_distance <= m_maxDistanceToPickUp)
                 {
-                    m_item = m_overlapResults[i].gameObject;
-                }
-                else
-                {
-                    if (Vector3.Distance(m_item.transform.position, transform.position) > Vector3.Distance(m_overlapResults[i].transform.position, transform.position))
+                    if (m_itemRigibody != null)
                     {
-                        m_item = m_overlapResults[i].gameObject;
+                        m_itemRigibody.useGravity = false;
+                        StartCoroutine(MoveItem(m_pickupParent.transform.position));
+
                     }
-                }
-            }
-
-            m_itemRigibody = m_item.GetComponent<Rigidbody>();
-            m_distance = Vector3.Distance(m_item.transform.position, m_tempParent.transform.position);
-
-            if (m_distance <= m_maxDistanceToPickUp) 
-            {
-                if(m_itemRigibody != null)
-                {
-                    m_itemRigibody.useGravity = false;
-
-                    StartCoroutine(MoveItem(m_tempParent.transform.position));
-                    m_itemRigibody.detectCollisions = true;
                 }
             }
         }
@@ -124,6 +105,7 @@ public class PickupItem : MonoBehaviour
         if (m_itemRigibody != null)
         {
             m_itemRigibody.useGravity = true;
+            m_itemRigibody.drag = m_previousDrag;
         }
 
         m_item = null;
@@ -140,6 +122,10 @@ public class PickupItem : MonoBehaviour
             yield return null;
 
         }
+
+        m_previousDrag = m_itemRigibody.drag;
+        m_itemRigibody.drag = m_currentItemDrag;
+        m_itemRigibody.detectCollisions = true;
 
         m_onItemPickedUpEvent.Raise(m_item.gameObject);
         m_isHolding = true;

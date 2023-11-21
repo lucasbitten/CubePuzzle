@@ -62,12 +62,12 @@ public class ItemHolder : MonoBehaviour, IInteractable
             return;
         }
 
-        item.transform.SetParent(transform);
 
         foreach (var spot in m_holderSpots)
         {
             if(spot.Item == null)
             {
+                item.transform.SetParent(spot.LockedItemPosition);
                 item.transform.position = spot.LockedItemPosition.position;
                 item.SetState(Item.ItemState.OnItemHolder);
                 spot.Item = item;
