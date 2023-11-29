@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using Unity.Mathematics;
@@ -7,9 +8,9 @@ using static CubeMovementController;
 [CreateAssetMenu(menuName = "Managers/Crosshair Maanager")]
 public class CrosshairManager : ScriptableObject
 {
-    [SerializeField] CubeManager m_cubeManager;
-    [SerializeField] float m_mouseDragStep = 5f;
+    [SerializeField, Required] CubeManager m_cubeManager;
     [field: SerializeField] public float MouseDragThreshold { get; private set; } = 30f;
+    [SerializeField] float m_mouseDragStep = 5f;
 
     Crosshair m_crosshair;
 

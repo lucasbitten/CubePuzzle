@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
@@ -5,25 +6,24 @@ using UnityEngine.UI;
 
 public class Crosshair : MonoBehaviour
 {
-    [SerializeField] private CrosshairManager m_crosshairManager;
-    [SerializeField] private Canvas m_arrowsCanvas;
+    [SerializeField, Required] private CrosshairManager m_crosshairManager;
+    [SerializeField, Required] private Canvas m_arrowsCanvas;
 
-    [SerializeField] Image m_centerImage;
-    [SerializeField] Sprite m_dragEnabledSprite;
-    [SerializeField] Sprite m_dragDisabledSprite;
+    [SerializeField, Required] Image m_centerImage;
+    [SerializeField, Required] Sprite m_dragEnabledSprite;
+    [SerializeField, Required] Sprite m_dragDisabledSprite;
 
+    [SerializeField, Required] Image m_rightInnerImage;
+    [SerializeField, Required] Image m_rightOutImage;
 
-    [SerializeField] Image m_rightInnerImage;
-    [SerializeField] Image m_rightOutImage;
+    [SerializeField, Required] Image m_leftInnerImage;
+    [SerializeField, Required] Image m_leftOutImage;
 
-    [SerializeField] Image m_leftInnerImage;
-    [SerializeField] Image m_leftOutImage;
+    [SerializeField, Required] Image m_upInnerImage;
+    [SerializeField, Required] Image m_upOutImage;
 
-    [SerializeField] Image m_upInnerImage;
-    [SerializeField] Image m_upOutImage;
-
-    [SerializeField] Image m_downInnerImage;
-    [SerializeField] Image m_downOutImage;
+    [SerializeField, Required] Image m_downInnerImage;
+    [SerializeField, Required] Image m_downOutImage;
 
     private void Awake()
     {

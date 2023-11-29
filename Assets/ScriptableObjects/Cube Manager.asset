@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9907660db8d4e404ebf0e02d30f094ab, type: 3}
   m_Name: Cube Manager
   m_EditorClassIdentifier: 
+  m_onPreRotationStartedEvent: {fileID: 11400000, guid: 58573aafb576e7547b994141b0caeea0,
+    type: 2}
   m_onRotationStartedEvent: {fileID: 11400000, guid: b85dc40c0d8684b4ebc6e8d181eba9f5,
     type: 2}
   m_onRotationEndedEvent: {fileID: 11400000, guid: 74509c6793650a846b25d3e82c757c5f,

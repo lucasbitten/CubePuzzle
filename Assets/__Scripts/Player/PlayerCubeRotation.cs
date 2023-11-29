@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Burst.CompilerServices;
@@ -14,14 +15,14 @@ public class PlayerCubeRotation : MonoBehaviour
         Left,
     }
 
+
+    [SerializeField, Required] CubeManager m_cubeManager;
+    [SerializeField, Required] CrosshairManager m_crosshairManager;
+    [SerializeField, Required] GameEvent_Void m_onDragStartedEvent;
+    [SerializeField, Required] GameEvent_Void m_onDragEndedEvent;
+    [SerializeField, Required] Transform m_playerCamera;
+
     [SerializeField] LayerMask m_cubeFacesLayer;
-
-    [SerializeField] CubeManager m_cubeManager;
-    [SerializeField] CrosshairManager m_crosshairManager;
-    [SerializeField] GameEvent_Void m_onDragStartedEvent;
-    [SerializeField] GameEvent_Void m_onDragEndedEvent;
-    [SerializeField] Transform m_playerCamera;
-
 
     Vector3 m_initialDragPosition;
     DragDirection m_rotationDirection;

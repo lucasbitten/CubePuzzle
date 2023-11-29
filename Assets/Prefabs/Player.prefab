@@ -406,15 +406,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32120264b098d5a488f52da4baa4babf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_pickupParent: {fileID: 3298665194080245868}
+  m_onItemPickedUpEvent: {fileID: 11400000, guid: 40be400c4d3c5df4187771c2df6df043,
+    type: 2}
   m_maxDistanceToPickUp: 5
   m_dropDistance: 1
   m_currentItemDrag: 10
-  m_pickupParent: {fileID: 3298665194080245868}
   m_itemLayer:
     serializedVersion: 2
     m_Bits: 512
-  m_onItemPickedUpEvent: {fileID: 11400000, guid: 40be400c4d3c5df4187771c2df6df043,
-    type: 2}
 --- !u!114 &6113163085328966221
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -427,15 +427,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f2aaf720e15c9844af183c03f225035, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_cubeFacesLayer:
-    serializedVersion: 2
-    m_Bits: 8192
   m_cubeManager: {fileID: 11400000, guid: 33a1a4b1d156da44ba0d144d3f2ab919, type: 2}
   m_crosshairManager: {fileID: 11400000, guid: 2143cab4931b77d4a98251f335e07526, type: 2}
   m_onDragStartedEvent: {fileID: 11400000, guid: 5026910e8b6dcc543a5e4809568f036a,
     type: 2}
   m_onDragEndedEvent: {fileID: 11400000, guid: 966cd6bc92e247c4084466e28235257f, type: 2}
   m_playerCamera: {fileID: 2581935366134760560}
+  m_cubeFacesLayer:
+    serializedVersion: 2
+    m_Bits: 8192
 --- !u!1 &8661718320921898059
 GameObject:
   m_ObjectHideFlags: 0
@@ -461,7 +461,7 @@ Transform:
   m_GameObject: {fileID: 8661718320921898059}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.1639998, z: 0.798}
+  m_LocalPosition: {x: 0, y: -0.29, z: 1.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

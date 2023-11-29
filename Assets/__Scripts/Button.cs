@@ -1,42 +1,58 @@
+using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.Presets;
 using UnityEngine;
 
-public class Button : MonoBehaviour
+public class Button : MonoBehaviour, IAttachable
 {
-    [SerializeField] GameObject m_interactableGO;
-    IInteractable m_interactable;
-    [SerializeField] bool m_pressed;
+    [SerializeField, RequiredIn(PrefabKind.InstanceInScene)] protected GameObject m_interactableGO;
+    [SerializeField] protected bool m_pressed;
+    [SerializeField] protected Animator m_animator;
+
+    protected IInteractable m_interactable;
+
+    public virtual Item.ItemState OnAttach()
+    {
+        return Item.ItemState.OnButton;
+    }
 
     private void Awake()
     {
         m_interactable = m_interactableGO.GetComponent<IInteractable>();
+
+        if(m_interactable == null )
+        {
+            m_interactable = m_interactableGO.GetComponentInChildren<IInteractable>();
+        }
+
         Debug.Assert(m_interactable != null, "Button doesn't have an interactable object assigned", gameObject);
     }
 
     void OnTriggerEnter(Collider other)
     {
-        if(m_interactable != null)
-        {
-            if (other.CompareTag("Items") || other.CompareTag("Player"))
-            {
-                m_pressed = true;
-                m_interactable.OnActivated();
-            }
-        }
-
+        HandlePressing(other, true);
     }
-    void OnTriggerExit(Collider other)
+
+    protected virtual void HandlePressing(Collider collider, bool pressed)
     {
         if (m_interactable != null)
         {
-            if (other.CompareTag("Items") || other.CompareTag("Player"))
+            if (collider.CompareTag("Items") || collider.CompareTag("Player"))
             {
-                m_pressed = false;
-                m_interactable.OnDeactivated();
+                m_pressed = !m_pressed;
+                if (m_pressed)
+                {
+                    m_interactable.OnActivated();
+                }
+                else
+                {
+                    m_interactable.OnDeactivated();
+                }
+                m_animator.SetBool("Activated", m_pressed);
             }
         }
     }
+
 
 }

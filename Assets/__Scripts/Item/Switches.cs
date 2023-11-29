@@ -1,10 +1,11 @@
-﻿using System.Collections;
+﻿using Sirenix.OdinInspector;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Switches : MonoBehaviour
 {
-    [SerializeField] LevelManager m_levelManager;
+    [SerializeField, Required] LevelManager m_levelManager;
     public bool pressed;
     void OnTriggerEnter(Collider other)
     {

@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,10 +9,11 @@ using static CubeMovementController;
 [CreateAssetMenu(menuName = "Managers/Cube Manager")]
 public class CubeManager : ScriptableObject
 {
-    [SerializeField] GameEvent_Void m_onRotationStartedEvent;
-    [SerializeField] GameEvent_Void m_onRotationEndedEvent;
-    [SerializeField] GameEvent_Int m_onFacesStartedRotatingEvent;
-    [SerializeField] GameEvent_Void m_onDragEndedEvent;
+    [SerializeField, Required] GameEvent_Void m_onPreRotationStartedEvent;
+    [SerializeField, Required] GameEvent_Void m_onRotationStartedEvent;
+    [SerializeField, Required] GameEvent_Void m_onRotationEndedEvent;
+    [SerializeField, Required] GameEvent_Int m_onFacesStartedRotatingEvent;
+    [SerializeField, Required] GameEvent_Void m_onDragEndedEvent;
 
     [SerializeField] List<MoveableFace> m_faces = new List<MoveableFace>();
     [field: SerializeField] public float DistanceToMove { get; private set; } = 10;
@@ -22,7 +24,14 @@ public class CubeManager : ScriptableObject
     GameObject m_facesYRotation = default;
     GameObject m_facesZRotation = default;
 
-
+    public Transform GetMainCubeTransform()
+    {
+        if(m_cubeMovementController != null)
+        {
+            return m_cubeMovementController.transform;
+        }
+        return null;
+    }
 
     public void SetCubeMovementController(CubeMovementController cubeMovementController)
     {
@@ -43,6 +52,7 @@ public class CubeManager : ScriptableObject
 
     public void RotateCube(RotationInfo rotationInfo)
     {
+        m_onPreRotationStartedEvent.Raise();
         m_onRotationStartedEvent.Raise();
         Transform facesRotationParent;
         List<MoveableFace.FacePosition> facesPositionsToMove;

@@ -1,10 +1,11 @@
-﻿using System.Collections;
+﻿using Sirenix.OdinInspector;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class ForceFieldCube : MonoBehaviour
 {
-    [SerializeField] LevelManager m_levelManager;
+    [SerializeField, Required] LevelManager m_levelManager;
 
     private void Awake()
     {

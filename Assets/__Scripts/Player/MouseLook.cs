@@ -1,12 +1,13 @@
-﻿using System.Collections;
+﻿using Sirenix.OdinInspector;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class MouseLook : MonoBehaviour
 {
-    [SerializeField] GameEvent_Void m_onDragStartedEvent;
-    [SerializeField] GameEvent_Void m_onDragEndedEvent;
-    [SerializeField] Transform m_player = default;
+    [SerializeField, Required] GameEvent_Void m_onDragStartedEvent;
+    [SerializeField, Required] GameEvent_Void m_onDragEndedEvent;
+    [SerializeField, Required] Transform m_player = default;
 
     [SerializeField] float m_sensitivity = 5f;
 

@@ -1,11 +1,11 @@
-﻿using System.Collections;
+﻿using Sirenix.OdinInspector;
+using System.Collections;
 using System.Collections.Generic;
 using Unity.Burst.CompilerServices;
 using UnityEngine;
 using UnityEngine.ProBuilder.MeshOperations;
 
-[RequireComponent(typeof(Rigidbody))]
-public class Item : MonoBehaviour
+public class Item : MonoBehaviour, IAttachable
 {
     public enum ItemState
     {
@@ -15,16 +15,19 @@ public class Item : MonoBehaviour
         OnObstacle,
         OnItem,
         OnBottom,
-        OnItemHolder
+        ItemLocked,
+        OnButton
     }
 
 
     //todo: fix item not attaching to correct face
 
-    [SerializeField] Rigidbody m_myRigidbody;
+    [SerializeField, Required] CubeManager m_cubeManager;
+    [SerializeField, Required] Rigidbody m_myRigidbody;
 
-    [SerializeField] GameEvent_Void m_onRotationStartedEvent;
-    [SerializeField] GameEvent_Void m_onRotationEndedEvent;
+    [SerializeField, Required] GameEvent_Void m_onPreRotationStartedEvent;
+    [SerializeField, Required] GameEvent_Void m_onRotationStartedEvent;
+    [SerializeField, Required] GameEvent_Void m_onRotationEndedEvent;
 
 
     [SerializeField] float m_collisionRadius;
@@ -43,12 +46,14 @@ public class Item : MonoBehaviour
 
     private void OnEnable()
     {
+        m_onPreRotationStartedEvent.EventListeners += OnPreRotationStarted;
         m_onRotationStartedEvent.EventListeners += OnRotationStarted;
         m_onRotationEndedEvent.EventListeners += OnRotationEnded;
     }
 
     private void OnDisable()
     {
+        m_onPreRotationStartedEvent.EventListeners -= OnPreRotationStarted;
         m_onRotationStartedEvent.EventListeners -= OnRotationStarted;
         m_onRotationEndedEvent.EventListeners -= OnRotationEnded;
     }
@@ -60,6 +65,32 @@ public class Item : MonoBehaviour
     private void OnRotationStarted(Void args)
     {
         LockMovement();
+    }
+
+    private void OnPreRotationStarted(Void obj)
+    {
+        //attach item to parent
+        if (m_objectToAttach != null)
+        {
+            m_myRigidbody.constraints = RigidbodyConstraints.FreezeRotation;
+
+            var vec = transform.eulerAngles;
+            vec.x = Mathf.Round(vec.x / 90) * 90;
+            vec.y = Mathf.Round(vec.y / 90) * 90;
+            vec.z = Mathf.Round(vec.z / 90) * 90;
+            transform.eulerAngles = vec;
+
+            transform.SetParent(m_objectToAttach);
+            if (m_lockMovement)
+            {
+                LockMovement();
+            }
+        }
+    }
+
+    public ItemState OnAttach()
+    {
+        return ItemState.OnItem;
     }
 
 
@@ -83,27 +114,19 @@ public class Item : MonoBehaviour
 
     public void UnlockMovement()
     {
-        if(ItemCurrentState == ItemState.OnItemHolder)
+        if(ItemCurrentState == ItemState.ItemLocked)
         {
             return;
         }
 
-        if(m_objectToAttach != null && m_objectToAttach.TryGetComponent(out MoveableFace face))
-        {
-            if(face.CurrentFacePosition != MoveableFace.FacePosition.Bottom)
-            {
-                DetachItem();
-            }
-        }
-        else
-        {
-            CheckUnderneath();
-        }
+        transform.SetParent(m_cubeManager.GetMainCubeTransform());
+
+        CheckUnderneath();
     }
 
     private void Update()
     {
-        if (ItemCurrentState == ItemState.OnItemHolder)
+        if (ItemCurrentState == ItemState.ItemLocked)
         {
             return;
         }
@@ -117,26 +140,11 @@ public class Item : MonoBehaviour
         if (Physics.Raycast(ray, out RaycastHit hitInfo, 0.5f, m_objectsToAttachLayer))
         {
             var hitGameObject = hitInfo.collider.gameObject;
-            if (hitGameObject.TryGetComponent(out MoveableFace face))
-            {
-                if (face.CurrentFacePosition == MoveableFace.FacePosition.Bottom)
-                {
-                    if (hitGameObject.transform != transform)
-                    {
-                        AttachToObject(hitGameObject.transform, ItemState.OnBottom);
-                        return true;
-                    }
-                }
-            }
-            else if (hitGameObject.CompareTag("Obstacles"))
-            {
-                AttachToObject(hitGameObject.transform, ItemState.OnObstacle);
-                return true;
 
-            }
-            else if (hitGameObject.gameObject.CompareTag("Items"))
+            if(hitGameObject != null && hitGameObject.TryGetComponent(out IAttachable attachable))
             {
-                AttachToObject(hitGameObject.transform, ItemState.OnItem);
+                var state = attachable.OnAttach();
+                AttachToObject(hitGameObject.transform, state);
                 return true;
             }
         }
@@ -161,26 +169,6 @@ public class Item : MonoBehaviour
 
     private void OnCollisionEnter(Collision other)
     {
-        if(m_objectToAttach != null)
-        {
-            if (other.gameObject == m_objectToAttach.gameObject)
-            {
-                m_myRigidbody.constraints = RigidbodyConstraints.FreezeRotation;
-
-                var vec = transform.eulerAngles;
-                vec.x = Mathf.Round(vec.x / 90) * 90;
-                vec.y = Mathf.Round(vec.y / 90) * 90;
-                vec.z = Mathf.Round(vec.z / 90) * 90;
-                transform.eulerAngles = vec;
-
-                transform.SetParent(m_objectToAttach);
-                if (m_lockMovement)
-                {
-                    LockMovement();
-                }
-            }
-        }
-
         if(ItemCurrentState == ItemState.BeingCarried)
         {
             if (!other.gameObject.CompareTag("Player"))
@@ -194,7 +182,7 @@ public class Item : MonoBehaviour
     {
         ItemCurrentState = ItemState.Falling;
         m_myRigidbody.constraints = RigidbodyConstraints.None;
-        transform.SetParent(transform.root);
+        transform.SetParent(m_cubeManager.GetMainCubeTransform());
         m_objectToAttach = null;
     }
 

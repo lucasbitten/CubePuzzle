@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Sirenix.OdinInspector;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -28,18 +29,20 @@ public class CubeMovementController : MonoBehaviour
     }
 
 
-    [SerializeField] private LevelManager m_levelManager;
-    [SerializeField] private CubeManager m_cubeManager;
+    [SerializeField, Required] private LevelManager m_levelManager;
+    [SerializeField, Required] private CubeManager m_cubeManager;
 
-    [SerializeField] GameObject m_facesXRotator = default;
-    [SerializeField] GameObject m_facesYRotator = default;
-    [SerializeField] GameObject m_facesZRotator = default;
+    [SerializeField, Required] GameObject m_facesXRotator = default;
+    [SerializeField, Required] GameObject m_facesYRotator = default;
+    [SerializeField, Required] GameObject m_facesZRotator = default;
 
-    [SerializeField] GameEvent_Void m_onRotationStartedEvent;
-    [SerializeField] GameEvent_Void m_onRotationEndedEvent;
-    [SerializeField] GameEvent_Int m_onFacesStartedRotatingEvent;
-    [SerializeField] GameEvent_Void m_onFaceMovementEndedEvent;
-    [SerializeField] GameEvent_Void m_onDragEndedEvent;
+    [SerializeField, Required] GameEvent_Void m_onRotationStartedEvent;
+    [SerializeField, Required] GameEvent_Void m_onRotationEndedEvent;
+    [SerializeField, Required] GameEvent_Int m_onFacesStartedRotatingEvent;
+    [SerializeField, Required] GameEvent_Void m_onFaceMovementEndedEvent;
+    [SerializeField, Required] GameEvent_Void m_onDragEndedEvent;
+
+    [SerializeField] float m_levelSize;
 
     [field: SerializeField] public List<MoveableFace> Faces { get; private set; } = new List<MoveableFace>();
 
@@ -50,7 +53,6 @@ public class CubeMovementController : MonoBehaviour
     private int m_facesRotating;
     RotationInfo m_currentRotationInfo;
 
-    [SerializeField] float m_levelSize;
 
     void Awake()
     {

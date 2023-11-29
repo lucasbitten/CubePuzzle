@@ -1,9 +1,10 @@
+using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ItemHolder : MonoBehaviour, IInteractable
+public class ItemHolder : MonoBehaviour, IInteractable, IAttachable
 {
     [System.Serializable]
     public class HolderSpot
@@ -12,10 +13,12 @@ public class ItemHolder : MonoBehaviour, IInteractable
         public Transform LockedItemPosition; 
     }
 
-    [SerializeField] Collider m_holderCollider;
-    [SerializeField] List<HolderSpot> m_holderSpots = new List<HolderSpot>();
-    [SerializeField] GameEvent_GameObject m_onItemPickedUpEvent;
+    [SerializeField, Required] Collider m_holderCollider;
+    [SerializeField, Required] GameEvent_GameObject m_onItemPickedUpEvent;
+    [SerializeField, Required] GameObject m_activeVisual;
+
     [SerializeField] bool m_isActive;
+    [SerializeField] List<HolderSpot> m_holderSpots = new List<HolderSpot>();
 
     int m_holderCapacity;
     int m_itemsCount;
@@ -26,7 +29,20 @@ public class ItemHolder : MonoBehaviour, IInteractable
     private void Awake()
     {
         m_holderCapacity = m_holderSpots.Count;
+        if(m_activeVisual)
+        {
+            m_activeVisual.SetActive(IsActive);
+        }
     }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.H))
+        {
+            UnlockAllItems();
+        }
+    }
+
 
     private void OnEnable()
     {
@@ -36,6 +52,11 @@ public class ItemHolder : MonoBehaviour, IInteractable
     private void OnDisable()
     {
         m_onItemPickedUpEvent.EventListeners -= OnItemPickedUp;
+    }
+
+    public Item.ItemState OnAttach()
+    {
+        return Item.ItemState.ItemLocked;
     }
 
     private void OnItemPickedUp(GameObject item)
@@ -69,19 +90,12 @@ public class ItemHolder : MonoBehaviour, IInteractable
             {
                 item.transform.SetParent(spot.LockedItemPosition);
                 item.transform.position = spot.LockedItemPosition.position;
-                item.SetState(Item.ItemState.OnItemHolder);
+                item.SetState(Item.ItemState.ItemLocked);
+                LockItemRigidbody(item, true);
                 spot.Item = item;
                 m_itemsCount++;
                 break;
             }
-        }
-    }
-
-    private void Update()
-    {
-        if(Input.GetKeyDown(KeyCode.H)) 
-        {
-            UnlockAllItems();
         }
     }
 
@@ -98,9 +112,19 @@ public class ItemHolder : MonoBehaviour, IInteractable
 
     void UnlockItem(HolderSpot spot)
     {
+        LockItemRigidbody(spot.Item,false);
         spot.Item.DetachItem();
         spot.Item = null;
         m_itemsCount--;
+    }
+
+    void LockItemRigidbody(Item item, bool isLocked)
+    {
+        if(item.TryGetComponent(out Rigidbody rigidyBody))
+        {
+            rigidyBody.useGravity = !isLocked;
+            rigidyBody.constraints = isLocked ? RigidbodyConstraints.FreezeAll : RigidbodyConstraints.None;            
+        }
     }
 
 
@@ -122,6 +146,11 @@ public class ItemHolder : MonoBehaviour, IInteractable
     {
         m_isActive = true;
         m_holderCollider.enabled = true;
+        if(m_activeVisual != null)
+        {
+            m_activeVisual.SetActive(m_isActive);
+        }
+
     }
 
     public void OnDeactivated()
@@ -129,5 +158,10 @@ public class ItemHolder : MonoBehaviour, IInteractable
         m_isActive = false;
         UnlockAllItems();
         m_holderCollider.enabled = false;
+        if(m_activeVisual != null)
+        {
+            m_activeVisual.SetActive(m_isActive);
+        }
+
     }
 }

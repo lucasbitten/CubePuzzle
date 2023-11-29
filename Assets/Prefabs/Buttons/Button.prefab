@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 839051549413070135}
   - component: {fileID: 3912299401560375359}
   - component: {fileID: 8697947557258369908}
-  m_Layer: 0
+  m_Layer: 16
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -63,7 +63,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: dfc08c90188302847afb04f628582097, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -115,11 +115,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4208115236537100481}
-  - component: {fileID: 1965505358459031959}
   - component: {fileID: 4335374162367825264}
-  m_Layer: 0
+  - component: {fileID: 6112228031771894194}
+  - component: {fileID: 2432243580588108617}
+  m_Layer: 16
   m_Name: Button
-  m_TagString: Untagged
+  m_TagString: Button
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -140,20 +141,6 @@ Transform:
   - {fileID: 6878343450346285751}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1965505358459031959
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2243491291841545089}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1c424e86d2740214b95ecb78f06a82a3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_interactableGO: {fileID: 0}
-  m_pressed: 1
 --- !u!54 &4335374162367825264
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -176,11 +163,47 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
+  m_UseGravity: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 122
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
+--- !u!95 &6112228031771894194
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2243491291841545089}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 1c4ad545d4c3ea84f917b9593c6ace2f, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &2432243580588108617
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2243491291841545089}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c424e86d2740214b95ecb78f06a82a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_interactableGO: {fileID: 0}
+  m_pressed: 0
+  m_animator: {fileID: 6112228031771894194}
 --- !u!1 &6144937474251488700
 GameObject:
   m_ObjectHideFlags: 0
@@ -193,8 +216,8 @@ GameObject:
   - component: {fileID: 3783506070143696520}
   - component: {fileID: 1437248264914552601}
   - component: {fileID: 2686993485194539721}
-  m_Layer: 0
-  m_Name: Cylinder
+  m_Layer: 16
+  m_Name: Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -243,7 +266,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c2ba98ef8a37b5a4bb7ece8c603311d3, type: 2}
+  - {fileID: 2100000, guid: a4b62a69d54e80347bd546999c6d4b9e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

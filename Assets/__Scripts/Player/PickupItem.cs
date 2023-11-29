@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Sirenix.OdinInspector;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,14 +9,13 @@ public class PickupItem : MonoBehaviour
     //TODO: corrigir comprotamento enquanto esta sendo carregado
 
 
+    [SerializeField, Required] Transform m_pickupParent;
+    [SerializeField, Required] GameEvent_GameObject m_onItemPickedUpEvent;
+
     [SerializeField] float m_maxDistanceToPickUp = 1;
     [SerializeField] float m_dropDistance = 1;
     [SerializeField] float m_currentItemDrag = 10f;
-    [SerializeField] Transform m_pickupParent;
     [SerializeField] LayerMask m_itemLayer;
-
-    [SerializeField] GameEvent_GameObject m_onItemPickedUpEvent;
-
 
     GameObject m_item;
     bool m_isHolding = false;
@@ -23,8 +23,6 @@ public class PickupItem : MonoBehaviour
 
     Rigidbody m_itemRigibody;
     private float m_previousDrag;
-
-
 
     private void OnDrawGizmos() {
         
@@ -85,6 +83,11 @@ public class PickupItem : MonoBehaviour
                     if (m_itemRigibody != null)
                     {
                         m_itemRigibody.useGravity = false;
+                        var item = m_item.GetComponent<Item>();
+                        if (item != null)
+                        {
+                            item.SetState(Item.ItemState.BeingCarried);
+                        }
                         StartCoroutine(MoveItem(m_pickupParent.transform.position));
 
                     }
@@ -126,7 +129,6 @@ public class PickupItem : MonoBehaviour
         m_previousDrag = m_itemRigibody.drag;
         m_itemRigibody.drag = m_currentItemDrag;
         m_itemRigibody.detectCollisions = true;
-
         m_onItemPickedUpEvent.Raise(m_item.gameObject);
         m_isHolding = true;
 

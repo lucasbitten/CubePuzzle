@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Sirenix.OdinInspector;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 
-public class MoveableFace : MonoBehaviour
+public class MoveableFace : MonoBehaviour, IAttachable
 {
     public enum FacePosition
     {
@@ -16,10 +17,10 @@ public class MoveableFace : MonoBehaviour
         Back
     }
 
-    [SerializeField] GameEvent_Void m_onFaceMovementEndedEvent;
-    [SerializeField] GameEvent_Void m_onDragEndedEvent;
-    [SerializeField] Renderer m_renderer;
-    [SerializeField] CubeMovementController m_cube;
+    [SerializeField, Required] GameEvent_Void m_onFaceMovementEndedEvent;
+    [SerializeField, Required] GameEvent_Void m_onDragEndedEvent;
+    [SerializeField, Required] Renderer m_renderer;
+    [SerializeField, Required] CubeMovementController m_cube;
 
     [field: SerializeField] public FacePosition CurrentFacePosition { get; private set; }
     [field: SerializeField] public FacePosition NextPosition { get; private set; }
@@ -37,7 +38,7 @@ public class MoveableFace : MonoBehaviour
         m_selectedMaterialPropertyBlock.SetColor("_BaseColor", Color.red);
 
         m_unselectedMaterialPropertyBlock = new MaterialPropertyBlock();
-        m_unselectedMaterialPropertyBlock.SetColor("_BaseColor", Color.blue);
+        m_unselectedMaterialPropertyBlock.SetColor("_BaseColor", Color.white);
 
         m_moveableFacesParent = transform.parent;
         name = $"{CurrentFacePosition} Face";
@@ -51,6 +52,16 @@ public class MoveableFace : MonoBehaviour
     private void OnDisable()
     {
         m_onDragEndedEvent.EventListeners -= OnDragEnded;
+    }
+
+    public Item.ItemState OnAttach()
+    {
+        if(CurrentFacePosition == FacePosition.Bottom)
+        {
+            return Item.ItemState.OnBottom;
+        }
+
+        return Item.ItemState.Invalid;
     }
 
 
