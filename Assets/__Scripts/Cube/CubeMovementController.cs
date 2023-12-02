@@ -31,6 +31,8 @@ public class CubeMovementController : MonoBehaviour
 
     [SerializeField, Required] private LevelManager m_levelManager;
     [SerializeField, Required] private CubeManager m_cubeManager;
+    [SerializeField, Required] private ItemsParentValue m_itemsParentValue;
+
 
     [SerializeField, Required] GameObject m_facesXRotator = default;
     [SerializeField, Required] GameObject m_facesYRotator = default;
@@ -49,14 +51,12 @@ public class CubeMovementController : MonoBehaviour
     List<MoveableFace> m_facesToMove = new List<MoveableFace>();
 
     public bool IsRotating { get; private set; }
-    List<Item> m_items;
     private int m_facesRotating;
     RotationInfo m_currentRotationInfo;
 
 
     void Awake()
     {
-        m_items = GetComponentsInChildren<Item>().ToList();
 
         m_levelManager.SetMainCube(this);
 
@@ -193,9 +193,9 @@ public class CubeMovementController : MonoBehaviour
     }
     public bool HasItemFalling() {
 
-        for ( int i = 0; i < m_items.Count; ++i ) 
+        foreach (Item item in m_itemsParentValue.Value.Items) 
         {
-            if (m_items[i].ItemCurrentState == Item.ItemState.Falling) 
+            if (item.ItemCurrentState == Item.ItemState.Falling) 
             {
                 return true;
             }

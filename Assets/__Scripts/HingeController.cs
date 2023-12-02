@@ -6,31 +6,31 @@ using UnityEngine;
 public class HingeController : MonoBehaviour, IInteractable, IAttachable
 {
     [SerializeField, Required] GameObject m_hingedObject;
-    [SerializeField, Required] Rigidbody m_rigidbody;
 
     [SerializeField] float m_openAngle = 90;
     [SerializeField] float m_closeAngle = 0;
     [SerializeField] float m_speed = 5;
+    [SerializeField] bool isExtended;
 
-    public bool IsActive { get => m_isActive; set => m_isActive = value; }
+    public bool IsActive { get => isExtended; set => isExtended = value; }
 
-    [SerializeField] bool m_isActive;
 
-    Vector3 m_eulerAngleVelocity;
+    Rigidbody m_rigidbody;
+
 
     private void Awake()
     {
-        m_eulerAngleVelocity = new Vector3(0, m_speed, 0);
+        m_rigidbody = GetComponent<Rigidbody>();
     }
 
     public void OnActivated()
     {
-        m_isActive = true;
+        isExtended = true;
     }
 
     public void OnDeactivated()
     {
-        m_isActive = false;
+        isExtended = false;
     }
 
     public Item.ItemState OnAttach()
@@ -40,7 +40,7 @@ public class HingeController : MonoBehaviour, IInteractable, IAttachable
 
     private void FixedUpdate()
     {
-        float targetAngle = m_isActive ? m_openAngle : m_closeAngle;
+        float targetAngle = isExtended ? m_openAngle : m_closeAngle;
         float currentAngle = m_rigidbody.transform.localEulerAngles.y;
 
         float angleDifference = Mathf.DeltaAngle(currentAngle, targetAngle);

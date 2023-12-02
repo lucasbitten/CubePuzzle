@@ -24,15 +24,6 @@ public class CubeManager : ScriptableObject
     GameObject m_facesYRotation = default;
     GameObject m_facesZRotation = default;
 
-    public Transform GetMainCubeTransform()
-    {
-        if(m_cubeMovementController != null)
-        {
-            return m_cubeMovementController.transform;
-        }
-        return null;
-    }
-
     public void SetCubeMovementController(CubeMovementController cubeMovementController)
     {
         m_cubeMovementController = cubeMovementController;

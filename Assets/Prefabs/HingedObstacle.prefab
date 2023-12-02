@@ -42,6 +42,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4726568382555347748}
   - component: {fileID: 2409308088343592339}
+  - component: {fileID: 1292310623180762110}
   m_Layer: 12
   m_Name: Hinge
   m_TagString: Obstacles
@@ -85,13 +86,30 @@ Rigidbody:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_ImplicitCom: 1
+  m_ImplicitCom: 0
   m_ImplicitTensor: 0
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 14
   m_CollisionDetection: 0
+--- !u!114 &1292310623180762110
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7727003568604628057}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04b9c6344e47b8c4195f9a099132cb3c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_hingedObject: {fileID: 9035904579797979310}
+  m_openAngle: 90
+  m_closeAngle: 0
+  m_speed: 1
+  isExtended: 0
 --- !u!1 &9035904579797979310
 GameObject:
   m_ObjectHideFlags: 0
@@ -104,8 +122,8 @@ GameObject:
   - component: {fileID: 4309863086750328851}
   - component: {fileID: 5088370878280924265}
   - component: {fileID: 8918425735577301359}
-  - component: {fileID: 4012471811857678941}
-  - component: {fileID: 782149507695585530}
+  - component: {fileID: 2539496920818065585}
+  - component: {fileID: 8005781419544387467}
   m_Layer: 12
   m_Name: HingedObject
   m_TagString: Obstacles
@@ -199,7 +217,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &4012471811857678941
+--- !u!114 &2539496920818065585
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -208,17 +226,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 9035904579797979310}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 04b9c6344e47b8c4195f9a099132cb3c, type: 3}
+  m_Script: {fileID: 11500000, guid: 696f539ef49c1314fb56cc28f3ba7b28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_animator: {fileID: 0}
-  m_hingedObject: {fileID: 9035904579797979310}
-  m_rigidbody: {fileID: 2409308088343592339}
-  m_openAngle: 90
-  m_closeAngle: 0
-  m_speed: 1
-  m_isActive: 0
---- !u!54 &782149507695585530
+--- !u!54 &8005781419544387467
 Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -243,5 +254,5 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 1
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 126
   m_CollisionDetection: 0

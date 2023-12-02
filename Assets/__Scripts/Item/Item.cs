@@ -3,7 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Burst.CompilerServices;
 using UnityEngine;
-using UnityEngine.ProBuilder.MeshOperations;
+using UnityEngine.Animations;
+using static UnityEngine.GraphicsBuffer;
 
 public class Item : MonoBehaviour, IAttachable
 {
@@ -24,6 +25,7 @@ public class Item : MonoBehaviour, IAttachable
 
     [SerializeField, Required] CubeManager m_cubeManager;
     [SerializeField, Required] Rigidbody m_myRigidbody;
+    [SerializeField, Required] ItemsParentValue m_itemsParentValue;
 
     [SerializeField, Required] GameEvent_Void m_onPreRotationStartedEvent;
     [SerializeField, Required] GameEvent_Void m_onRotationStartedEvent;
@@ -35,8 +37,16 @@ public class Item : MonoBehaviour, IAttachable
 
     [SerializeField] Transform m_objectToAttach;
     [field: SerializeField] public ItemState ItemCurrentState { get; private set; } = ItemState.Invalid;
+    [SerializeField] float m_raycastDistance = 0.75f;
 
     bool m_lockMovement;
+    ParentConstraint m_parentConstraint;
+    ConstraintSource m_constraintSource;
+
+    private void Awake()
+    {
+        m_parentConstraint = GetComponent<ParentConstraint>();
+    }
 
     private void Start()
     {
@@ -81,10 +91,28 @@ public class Item : MonoBehaviour, IAttachable
             transform.eulerAngles = vec;
 
             transform.SetParent(m_objectToAttach);
+
             if (m_lockMovement)
             {
                 LockMovement();
             }
+
+            //m_constraintSource = new ConstraintSource
+            //{
+            //    sourceTransform = m_objectToAttach,
+            //    weight = 1f // Define a importância da influência do objeto alvo na posição
+            //};
+
+            //var positionDelta = m_objectToAttach.transform.position - transform.position;
+            //var initialRotationOffset = Quaternion.Inverse(m_objectToAttach.rotation) * transform.rotation;
+
+
+            //m_parentConstraint.constraintActive = true;
+            //m_parentConstraint.AddSource(m_constraintSource);
+            //m_parentConstraint.SetTranslationOffset(0, positionDelta);  // this was it
+            //m_parentConstraint.SetRotationOffset(0, initialRotationOffset.eulerAngles);
+
+
         }
     }
 
@@ -109,7 +137,7 @@ public class Item : MonoBehaviour, IAttachable
         //Gizmos.color = Color.yellow;        
         //Gizmos.DrawWireSphere(transform.position, m_collisionRadius);
         var ray = new Ray(transform.position, Vector3.down);
-        Debug.DrawRay(ray.origin, ray.direction * 0.5f, Color.yellow);
+        Debug.DrawRay(ray.origin, ray.direction * m_raycastDistance, Color.yellow);
     }
 
     public void UnlockMovement()
@@ -119,13 +147,19 @@ public class Item : MonoBehaviour, IAttachable
             return;
         }
 
-        transform.SetParent(m_cubeManager.GetMainCubeTransform());
+        transform.SetParent(m_itemsParentValue.Value.transform);
 
         CheckUnderneath();
     }
 
     private void Update()
     {
+        if(Input.GetKeyDown(KeyCode.J))
+        {
+            OnPreRotationStarted(new Void());
+        }
+
+
         if (ItemCurrentState == ItemState.ItemLocked)
         {
             return;
@@ -136,8 +170,14 @@ public class Item : MonoBehaviour, IAttachable
 
     public bool CheckCollision()
     {
+        if(m_myRigidbody.velocity.sqrMagnitude > 0)
+        {
+            return false;
+        }
+
+
         var ray = new Ray(transform.position, Vector3.down);
-        if (Physics.Raycast(ray, out RaycastHit hitInfo, 0.5f, m_objectsToAttachLayer))
+        if (Physics.Raycast(ray, out RaycastHit hitInfo, m_raycastDistance, m_objectsToAttachLayer))
         {
             var hitGameObject = hitInfo.collider.gameObject;
 
@@ -180,9 +220,11 @@ public class Item : MonoBehaviour, IAttachable
 
     public void DetachItem()
     {
+        //m_parentConstraint.constraintActive = false;
+        //m_parentConstraint.SetSources(new List<ConstraintSource>());
         ItemCurrentState = ItemState.Falling;
         m_myRigidbody.constraints = RigidbodyConstraints.None;
-        transform.SetParent(m_cubeManager.GetMainCubeTransform());
+        transform.SetParent(m_itemsParentValue.Value.transform);
         m_objectToAttach = null;
     }
 

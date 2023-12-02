@@ -17,6 +17,14 @@ public class MoveableFace : MonoBehaviour, IAttachable
         Back
     }
 
+    public enum FaceState
+    {
+        Invalid = -1,
+        Separating,
+        Rotating,
+        Gathering
+    }
+
     [SerializeField, Required] GameEvent_Void m_onFaceMovementEndedEvent;
     [SerializeField, Required] GameEvent_Void m_onDragEndedEvent;
     [SerializeField, Required] Renderer m_renderer;
@@ -24,7 +32,9 @@ public class MoveableFace : MonoBehaviour, IAttachable
 
     [field: SerializeField] public FacePosition CurrentFacePosition { get; private set; }
     [field: SerializeField] public FacePosition NextPosition { get; private set; }
+    [SerializeField] FaceState m_faceState = FaceState.Invalid; 
 
+    Rigidbody m_rigidbody;
     Transform m_moveableFacesParent;
     public Vector3 m_targetLocation;
 
@@ -40,6 +50,7 @@ public class MoveableFace : MonoBehaviour, IAttachable
         m_unselectedMaterialPropertyBlock = new MaterialPropertyBlock();
         m_unselectedMaterialPropertyBlock.SetColor("_BaseColor", Color.white);
 
+        m_rigidbody = GetComponent<Rigidbody>();
         m_moveableFacesParent = transform.parent;
         name = $"{CurrentFacePosition} Face";
     }
@@ -70,23 +81,27 @@ public class MoveableFace : MonoBehaviour, IAttachable
         Unselected();
     }
 
-    public void StartMovingFaces(Transform rotateAxis, Vector3 axis, float distanceToMove, float angle)
+    public void StartMovingFaces(Transform rotationAxis, Vector3 axis, float distanceToMove, float angle)
     {
-        StartCoroutine(MoveFaces(rotateAxis, axis, distanceToMove, angle));
+        StartCoroutine(MoveFaces(rotationAxis, axis, distanceToMove, angle));
     }
 
-    IEnumerator MoveFaces(Transform rotateAxis, Vector3 axis, float distanceToMove, float angle)
+    IEnumerator MoveFaces(Transform rotationAxis, Vector3 axis, float distanceToMove, float angle)
     {
         bool goingBack = false;
         CalculateEndPosition(distanceToMove, goingBack, angle); // Calculate separated position
         Debug.Log($"Separated Position {m_targetLocation}");
-        yield return StartCoroutine(SeparateOrGatherFaces()); // Separating faces from main cube
-        yield return StartCoroutine(m_cube.RotateEachFace(rotateAxis, axis, angle, Mathf.Abs(angle / 90))); // Moving faces to new cube sides
+        StartMovement(); // Separating faces from main cube
+        yield return new WaitWhile(() => m_faceState == FaceState.Separating);
+        //yield return StartCoroutine(SeparateOrGatherFaces()); 
+        yield return StartCoroutine(m_cube.RotateEachFace(rotationAxis, axis, angle, Mathf.Abs(angle / 90))); // Moving faces to new cube sides
         CalculateEndPosition(-distanceToMove, !goingBack, angle); // Calculate end position
-        Debug.Log($"Gather Position {m_targetLocation}");
+        //Debug.Log($"Gather Position {m_targetLocation}");
 
+        EndMovement();
         yield return StartCoroutine(AssembleFaces()); // Moving faces back to main cube
         m_onFaceMovementEndedEvent.Raise();
+        yield return null; 
     }
 
 
@@ -123,7 +138,8 @@ public class MoveableFace : MonoBehaviour, IAttachable
 
     IEnumerator AssembleFaces()
     {
-        yield return StartCoroutine(SeparateOrGatherFaces());
+        //yield return StartCoroutine(SeparateOrGatherFaces());
+        yield return new WaitWhile(() => m_faceState == FaceState.Gathering);
 
         transform.position = new Vector3(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y), Mathf.RoundToInt(transform.position.z));
         //cube.SetBottomFace();
@@ -155,6 +171,53 @@ public class MoveableFace : MonoBehaviour, IAttachable
 
         // Complete the motion to prevent negligible sliding
         transform.position = m_targetLocation;
+    }
+
+    float m_elapsedTime = 0;
+    float m_closeEnough = 0.1f;
+    float m_distance;
+    Vector3 m_direction;
+    public float m_speed = 5;
+
+    void EndMovement()
+    {
+        m_distance = (transform.position - m_targetLocation).magnitude;
+        m_direction = (m_targetLocation - transform.position).normalized;
+        m_elapsedTime = 0;
+        m_faceState = FaceState.Gathering;
+        m_rigidbody.freezeRotation = true;
+        m_rigidbody.isKinematic = false;
+        m_rigidbody.velocity = m_direction * m_speed;
+    }
+
+    void StartMovement()
+    {
+        m_distance = (transform.position - m_targetLocation).magnitude;
+        m_direction = (m_targetLocation - transform.position).normalized;
+        m_elapsedTime = 0;
+        m_faceState = FaceState.Separating;
+        m_rigidbody.isKinematic = false;
+        m_rigidbody.velocity = m_direction * m_speed;
+
+    }
+
+    void FixedUpdate()
+    {
+        if (m_faceState == FaceState.Separating || m_faceState == FaceState.Gathering)
+        {
+            if(m_distance >= m_closeEnough)
+            {                
+                m_distance = (transform.position - m_targetLocation).magnitude;
+            }
+            else
+            {
+                m_rigidbody.velocity = Vector3.zero;
+                m_rigidbody.isKinematic = true;
+                transform.position = m_targetLocation;
+                m_faceState = m_faceState == FaceState.Separating ? FaceState.Rotating : FaceState.Invalid;
+            }
+        }
+
     }
 
     public void SetDirection()

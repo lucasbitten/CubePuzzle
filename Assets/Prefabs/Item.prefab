@@ -115,7 +115,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 102857045906896915}
   serializedVersion: 4
-  m_Mass: 500
+  m_Mass: 30
   m_Drag: 0
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -133,7 +133,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 1
+  m_CollisionDetection: 2
 --- !u!114 &102857045906896913
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -148,6 +148,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_cubeManager: {fileID: 11400000, guid: 33a1a4b1d156da44ba0d144d3f2ab919, type: 2}
   m_myRigidbody: {fileID: 102857045906896918}
+  m_itemsParentValue: {fileID: 11400000, guid: 2358f3aba581f5749a2700279a262011, type: 2}
   m_onPreRotationStartedEvent: {fileID: 11400000, guid: 58573aafb576e7547b994141b0caeea0,
     type: 2}
   m_onRotationStartedEvent: {fileID: 11400000, guid: b85dc40c0d8684b4ebc6e8d181eba9f5,
@@ -160,3 +161,4 @@ MonoBehaviour:
     m_Bits: 78336
   m_objectToAttach: {fileID: 0}
   <ItemCurrentState>k__BackingField: -1
+  m_raycastDistance: 1

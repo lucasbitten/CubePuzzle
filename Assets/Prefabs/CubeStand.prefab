@@ -739,6 +739,7 @@ GameObject:
   - component: {fileID: 3486670472547657907}
   - component: {fileID: 1114341981366657877}
   - component: {fileID: 7801024031435980109}
+  - component: {fileID: 3860860279381172228}
   m_Layer: 12
   m_Name: Cube
   m_TagString: Obstacles
@@ -833,3 +834,15 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &3860860279381172228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8836107662185760698}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 696f539ef49c1314fb56cc28f3ba7b28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
