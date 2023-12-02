@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.SearchService;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [CreateAssetMenu(menuName = "Managers/Level Manager")]
 public class LevelManager : ScriptableObject
@@ -47,7 +49,7 @@ public class LevelManager : ScriptableObject
             }
         }
 
-        Debug.Log("Level Completo!");
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
 
     }
 

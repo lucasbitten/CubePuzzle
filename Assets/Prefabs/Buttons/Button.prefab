@@ -202,6 +202,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_interactableGO: {fileID: 0}
+  m_onInteractableChanged: {fileID: 11400000, guid: 92d5d6f34f29ce142a7ffb1f444673f6,
+    type: 2}
   m_pressed: 0
   m_animator: {fileID: 6112228031771894194}
 --- !u!1 &6144937474251488700

@@ -7,8 +7,10 @@ using UnityEngine;
 public class Button : MonoBehaviour, IAttachable
 {
     [SerializeField, RequiredIn(PrefabKind.InstanceInScene)] protected GameObject m_interactableGO;
+    [SerializeField, Required] protected GameEvent_GameObject m_onInteractableChanged;
     [SerializeField] protected bool m_pressed;
     [SerializeField] protected Animator m_animator;
+
 
     protected IInteractable m_interactable;
 
@@ -49,6 +51,7 @@ public class Button : MonoBehaviour, IAttachable
                 {
                     m_interactable.OnDeactivated();
                 }
+                m_onInteractableChanged.Raise(m_interactableGO);
                 m_animator.SetBool("Activated", m_pressed);
             }
         }

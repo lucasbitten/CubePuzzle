@@ -37,6 +37,8 @@ public class HoldButton : Button
                 {
                     m_interactable.OnDeactivated();
                 }
+                m_onInteractableChanged.Raise(m_interactableGO);
+
             }
         }
     }

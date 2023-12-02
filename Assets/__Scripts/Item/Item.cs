@@ -30,24 +30,22 @@ public class Item : MonoBehaviour, IAttachable
     [SerializeField, Required] GameEvent_Void m_onPreRotationStartedEvent;
     [SerializeField, Required] GameEvent_Void m_onRotationStartedEvent;
     [SerializeField, Required] GameEvent_Void m_onRotationEndedEvent;
+    [SerializeField, Required] GameEvent_GameObject m_onInteractableChanged;
 
-
-    [SerializeField] float m_collisionRadius;
     [SerializeField] LayerMask m_objectsToAttachLayer;
 
     [SerializeField] Transform m_objectToAttach;
     [field: SerializeField] public ItemState ItemCurrentState { get; private set; } = ItemState.Invalid;
     [SerializeField] float m_raycastDistance = 0.75f;
 
+    WaitForSeconds m_waitForSeconds;
     bool m_lockMovement;
-    ParentConstraint m_parentConstraint;
-    ConstraintSource m_constraintSource;
+
 
     private void Awake()
     {
-        m_parentConstraint = GetComponent<ParentConstraint>();
+        m_waitForSeconds = new WaitForSeconds(0.1f);
     }
-
     private void Start()
     {
         Physics.IgnoreLayerCollision(9,10);
@@ -59,6 +57,7 @@ public class Item : MonoBehaviour, IAttachable
         m_onPreRotationStartedEvent.EventListeners += OnPreRotationStarted;
         m_onRotationStartedEvent.EventListeners += OnRotationStarted;
         m_onRotationEndedEvent.EventListeners += OnRotationEnded;
+        m_onInteractableChanged.EventListeners += OnInteractableChanged;
     }
 
     private void OnDisable()
@@ -66,6 +65,7 @@ public class Item : MonoBehaviour, IAttachable
         m_onPreRotationStartedEvent.EventListeners -= OnPreRotationStarted;
         m_onRotationStartedEvent.EventListeners -= OnRotationStarted;
         m_onRotationEndedEvent.EventListeners -= OnRotationEnded;
+        m_onInteractableChanged.EventListeners -= OnInteractableChanged;
     }
 
     private void OnRotationEnded(Void args)
@@ -75,6 +75,18 @@ public class Item : MonoBehaviour, IAttachable
     private void OnRotationStarted(Void args)
     {
         LockMovement();
+    }
+
+
+    private void OnInteractableChanged(GameObject args)
+    {
+        StartCoroutine(WaitToCheckItem());
+    }
+
+    IEnumerator WaitToCheckItem()
+    {
+        yield return m_waitForSeconds;
+        UnlockMovement();
     }
 
     private void OnPreRotationStarted(Void obj)
@@ -96,23 +108,6 @@ public class Item : MonoBehaviour, IAttachable
             {
                 LockMovement();
             }
-
-            //m_constraintSource = new ConstraintSource
-            //{
-            //    sourceTransform = m_objectToAttach,
-            //    weight = 1f // Define a importância da influência do objeto alvo na posição
-            //};
-
-            //var positionDelta = m_objectToAttach.transform.position - transform.position;
-            //var initialRotationOffset = Quaternion.Inverse(m_objectToAttach.rotation) * transform.rotation;
-
-
-            //m_parentConstraint.constraintActive = true;
-            //m_parentConstraint.AddSource(m_constraintSource);
-            //m_parentConstraint.SetTranslationOffset(0, positionDelta);  // this was it
-            //m_parentConstraint.SetRotationOffset(0, initialRotationOffset.eulerAngles);
-
-
         }
     }
 
@@ -134,8 +129,6 @@ public class Item : MonoBehaviour, IAttachable
 
     private void OnDrawGizmos()
     {
-        //Gizmos.color = Color.yellow;        
-        //Gizmos.DrawWireSphere(transform.position, m_collisionRadius);
         var ray = new Ray(transform.position, Vector3.down);
         Debug.DrawRay(ray.origin, ray.direction * m_raycastDistance, Color.yellow);
     }
@@ -220,8 +213,6 @@ public class Item : MonoBehaviour, IAttachable
 
     public void DetachItem()
     {
-        //m_parentConstraint.constraintActive = false;
-        //m_parentConstraint.SetSources(new List<ConstraintSource>());
         ItemCurrentState = ItemState.Falling;
         m_myRigidbody.constraints = RigidbodyConstraints.None;
         transform.SetParent(m_itemsParentValue.Value.transform);

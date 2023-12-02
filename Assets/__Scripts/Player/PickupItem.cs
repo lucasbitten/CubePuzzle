@@ -32,7 +32,7 @@ public class PickupItem : MonoBehaviour
 
     private void Update() 
     {
-        if (Input.GetKeyDown(KeyCode.G)) 
+        if (Input.GetKeyDown(KeyCode.G) || Input.GetMouseButtonDown(0)) 
         {
 
             if (m_isHolding == false) 
