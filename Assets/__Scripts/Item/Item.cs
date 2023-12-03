@@ -80,7 +80,10 @@ public class Item : MonoBehaviour, IAttachable
 
     private void OnInteractableChanged(GameObject args)
     {
-        StartCoroutine(WaitToCheckItem());
+        if(ItemCurrentState != ItemState.BeingCarried)
+        {
+            StartCoroutine(WaitToCheckItem());
+        }
     }
 
     IEnumerator WaitToCheckItem()

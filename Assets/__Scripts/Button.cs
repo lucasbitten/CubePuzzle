@@ -21,6 +21,8 @@ public class Button : MonoBehaviour, IAttachable
 
     private void Awake()
     {
+        m_animator.SetBool("Activated", m_pressed);
+
         m_interactable = m_interactableGO.GetComponent<IInteractable>();
 
         if(m_interactable == null )

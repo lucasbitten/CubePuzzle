@@ -18,7 +18,7 @@ public class PickupItem : MonoBehaviour
     [SerializeField] LayerMask m_itemLayer;
 
     GameObject m_item;
-    bool m_isHolding = false;
+    public bool IsHoldingItem { get; private set; }
     float m_distance;
 
     Rigidbody m_itemRigibody;
@@ -32,10 +32,10 @@ public class PickupItem : MonoBehaviour
 
     private void Update() 
     {
-        if (Input.GetKeyDown(KeyCode.G) || Input.GetMouseButtonDown(0)) 
+        if (Input.GetKeyDown(KeyCode.G) /*|| Input.GetMouseButtonDown(0)*/) 
         {
 
-            if (m_isHolding == false) 
+            if (IsHoldingItem == false) 
             {
                 PickUp();
             } else
@@ -46,7 +46,7 @@ public class PickupItem : MonoBehaviour
         }
 
 
-        if(m_isHolding)
+        if(IsHoldingItem)
         {
             m_distance = Vector3.Distance(m_item.transform.position, m_pickupParent.transform.position);
             m_item.transform.SetParent(m_pickupParent.transform);
@@ -68,7 +68,7 @@ public class PickupItem : MonoBehaviour
 
     void PickUp(){
 
-        if (m_isHolding == false) 
+        if (IsHoldingItem == false) 
         {
             RaycastHit hit;
             if(Physics.Raycast(m_pickupParent.position, m_pickupParent.TransformDirection(Vector3.forward), out hit, m_maxDistanceToPickUp,  m_itemLayer))
@@ -98,7 +98,7 @@ public class PickupItem : MonoBehaviour
 
     public void Drop(){
         
-        m_isHolding = false;
+        IsHoldingItem = false;
         var item = m_item.GetComponent<Item>();
         if (item != null)
         {
@@ -130,7 +130,7 @@ public class PickupItem : MonoBehaviour
         m_itemRigibody.drag = m_currentItemDrag;
         m_itemRigibody.detectCollisions = true;
         m_onItemPickedUpEvent.Raise(m_item.gameObject);
-        m_isHolding = true;
+        IsHoldingItem = true;
 
     }
 }

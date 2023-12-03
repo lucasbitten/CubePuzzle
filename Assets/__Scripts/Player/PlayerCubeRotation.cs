@@ -15,7 +15,7 @@ public class PlayerCubeRotation : MonoBehaviour
         Left,
     }
 
-
+    [SerializeField, Required] PickupItem m_pickupItem;
     [SerializeField, Required] CubeManager m_cubeManager;
     [SerializeField, Required] CrosshairManager m_crosshairManager;
     [SerializeField, Required] GameEvent_Void m_onDragStartedEvent;
@@ -52,6 +52,10 @@ public class PlayerCubeRotation : MonoBehaviour
             }
         }
 
+        if (m_pickupItem.IsHoldingItem)
+        {
+            return;
+        }
 
         if (Input.GetMouseButtonDown(1) && dragEnabled)
         {

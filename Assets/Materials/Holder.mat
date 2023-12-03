@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: ForceField
+  m_Name: Holder
   m_Shader: {fileID: -6465566751694194690, guid: 8ce20f1e4fa07f440a30d39d9bbc2ce5,
     type: 3}
   m_Parent: {fileID: 0}
@@ -182,14 +182,14 @@ Material:
     - _EdgeWidth: 0.2
     - _Edge_Width: 0.25
     - _Edige_Width: 0.2
-    - _Fill: 0.03
-    - _FresnelPower: 5
+    - _Fill: 0.2
+    - _FresnelPower: 3
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
     - _HexNoiseScale: 1
     - _HexScale: 1
-    - _IntersectionDepth: 1
+    - _IntersectionDepth: 10
     - _METALNESS: 0
     - _MaskPower: 1
     - _Metallic: 0
@@ -223,11 +223,11 @@ Material:
     - _BASE_COLOR: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 2, g: 0, b: 0, a: 1}
     - _EMISSION_COLOR: {r: 0, g: 0, b: 0, a: 0}
-    - _Emission: {r: 1.4142135, g: 1.4142135, b: 1.4142135, a: 0}
+    - _Emission: {r: 1.8880861, g: 0, b: 0, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _NoiseSpeed: {r: 0, g: 0.2, b: 0, a: 0}
     - _REFLECTIONS_COLOR: {r: 1, g: 1, b: 1, a: 1}
     - _SPECULAR_COLOR: {r: 1, g: 1, b: 1, a: 0}
     - _ScrollSpeed: {r: 0, g: 0.2, b: 0, a: 0}
-    - _Tilling: {r: 20, g: 20, b: 0, a: 0}
+    - _Tilling: {r: 20, g: 10, b: 0, a: 0}
   m_BuildTextureStacks: []

@@ -90,6 +90,7 @@ public class ItemHolder : MonoBehaviour, IInteractable, IAttachable
             {
                 item.transform.SetParent(spot.LockedItemPosition);
                 item.transform.position = spot.LockedItemPosition.position;
+                item.transform.rotation = Quaternion.identity;
                 item.SetState(Item.ItemState.ItemLocked);
                 LockItemRigidbody(item, true);
                 spot.Item = item;
@@ -138,9 +139,40 @@ public class ItemHolder : MonoBehaviour, IInteractable, IAttachable
 
         if (other.gameObject.TryGetComponent(out Item item))
         {
-            LockItem(item);
+            if(item.ItemCurrentState != Item.ItemState.BeingCarried)
+            {
+                LockItem(item);
+            }
         }
     }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (m_itemsCount == m_holderCapacity)
+        {
+            return;
+        }
+
+        if (other.gameObject.TryGetComponent(out Item item))
+        {
+            foreach (var spots in m_holderSpots)
+            {
+                if(item ==  spots.Item)
+                {
+                    return;
+                }
+            }
+
+
+            if (item.ItemCurrentState != Item.ItemState.BeingCarried)
+            {
+                LockItem(item);
+            }
+        }
+    }
+
+
+
 
     public void OnActivated()
     {
